@@ -1,6 +1,10 @@
+.DS_Store
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
+*.Rproj
+.quarto/
 
 *.zip
+recs_2016/

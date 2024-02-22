@@ -1,0 +1,79 @@
+```{r libraries, echo = FALSE, message = FALSE}
+# load libraries and any relevant data here
+library(tidyverse)
+
+recs <- readRDS("../data/recs_2015_cleaned.RDS")
+```
+
+## Summary and missing data
+
+```{r}
+summary(recs)
+```
+No variables are missing! Note that natural gas, propane, and other fuels all have a 1st quartile of 0, and propane and other fuels have up to a 3rd quartile of 0. This indicates that many of the houses included in this dataset do not use propane or fuels categorized as "other", which is not surprising based on knowledge of fuel types. It also indicates that a relatively significant amount of houses do not use natural gas.
+
+Also note that some of these variables represent levels, and thus their summary statistics may not have an interpretable meaning.
+
+
+## Preliminary visualizations
+
+Metropolitan or Micropolitan Statistical Area by Region
+
+```{r}
+recs %>%
+  mutate(
+    region_name = case_when(
+      REGIONC == 1 ~ "Northeast",
+      REGIONC == 2 ~ "Midwest",
+      REGIONC == 3 ~ "South",
+      REGIONC == 4 ~ "West"
+    )
+  ) %>% 
+  ggplot(aes(x = METROMICRO)) +
+    geom_bar(aes(fill = region_name), position = "dodge") +
+    theme_classic()
+```
+
+
+Histogram of housing type
+
+```{r}
+recs %>% 
+  mutate(
+    housing_type = case_when(
+      TYPEHUQ == 1 ~ "Mobile home",
+      TYPEHUQ == 2 ~ "Single family detached",
+      TYPEHUQ == 3 ~ "Single family attached",
+      TYPEHUQ == 4 ~ "Apt small building",
+      TYPEHUQ == 5 ~ "Apt large building"
+    )
+  ) %>% 
+  ggplot(aes(x = housing_type)) +
+  geom_bar() +
+  theme_classic()
+# if we use this please tilt x labels
+```
+
+
+Histogram of age range (facet by region?)
+
+```{r}
+recs$yearmade <- factor(recs$yearmade, levels = c(
+  "Before 1950", "1950 to 1959", "1960 to 1969", "1970 to 1979", "1980 to 1989", "1990 to 1999", "2000 to 2009", "2010 to 2015"
+))
+
+ggplot(recs, aes(x = yearmade)) +
+  geom_bar() +
+  theme_classic()
+```
+
+
+comparison of el, ng, lp, fo
+
+```{r}
+ggplot(recs, aes(x = BTUEL, y = BTUNG)) +
+  geom_point() +
+  theme_classic()
+```
+
+
