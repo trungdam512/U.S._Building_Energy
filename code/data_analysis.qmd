@@ -50,8 +50,8 @@ recs %>%
   ) %>% 
   ggplot(aes(x = housing_type)) +
   geom_bar() +
-  theme_classic()
-# if we use this please tilt x labels
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 25, hjust = 1, vjust = 1)) 
 ```
 
 
@@ -77,3 +77,51 @@ ggplot(recs, aes(x = BTUEL, y = BTUNG)) +
 ```
 
 
+Electricity use by region
+
+```{r}
+recs %>%
+  mutate(
+    region_name = case_when(
+      REGIONC == 1 ~ "Northeast",
+      REGIONC == 2 ~ "Midwest",
+      REGIONC == 3 ~ "South",
+      REGIONC == 4 ~ "West"
+    )
+  ) %>% 
+ggplot(aes(y = BTUEL, x = region_name)) +
+  geom_boxplot() +
+  theme_classic()
+```
+It's interesting that the South has a noticeably higher IQR than the other regions- maybe due to use of air conditioning?
+
+
+Boxplot of electricity use by year the building was built
+
+```{r}
+recs$yearmade <- factor(recs$yearmade, levels = c(
+  "Before 1950", "1950 to 1959", "1960 to 1969", "1970 to 1979", "1980 to 1989", "1990 to 1999", "2000 to 2009", "2010 to 2015"
+)) 
+ggplot(recs, aes(x = yearmade, y = BTUEL)) +
+  geom_boxplot() +
+  theme_classic()
+```
+Electricity use seems to increase in as buildings get newer; it makes sense in that newer buildings would likely include more features that use electricity.
+
+
+Barplot of total energy usage by year range and region of building
+
+```{r}
+recs$yearmade <- factor(recs$yearmade, levels = c(
+  "Before 1950", "1950 to 1959", "1960 to 1969", "1970 to 1979", "1980 to 1989", "1990 to 1999", "2000 to 2009", "2010 to 2015"
+))
+
+recs %>% 
+  group_by(yearmade, region_name) %>% 
+  summarise(agg_btu = sum(TOTALBTU)) %>% 
+ggplot(aes(y = agg_btu, x = yearmade, fill = region_name)) +
+  geom_bar(stat = 'identity') +
+   theme_classic() +
+  theme(axis.text.x = element_text(angle = 35, hjust = 1, vjust = 1)) 
+```
+Is  2010-2015 category so low because data was only collected through 2010? Is there a less misleading way to represent that?
