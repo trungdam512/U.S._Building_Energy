@@ -125,3 +125,9 @@ ggplot(aes(y = agg_btu, x = yearmade, fill = region_name)) +
   theme(axis.text.x = element_text(angle = 35, hjust = 1, vjust = 1)) 
 ```
 Is  2010-2015 category so low because data was only collected through 2010? Is there a less misleading way to represent that?
+
+
+```{r}
+ sessionInfo()
+```
+
