@@ -127,6 +127,18 @@ ggplot(aes(y = agg_btu, x = yearmade, fill = region_name)) +
 Is  2010-2015 category so low because data was only collected through 2010? Is there a less misleading way to represent that?
 
 
+
+Plan for Plan for Milestone 3:
+
+-Meet to revise/specify broad questions
+
+-Load in and clean additional datasets
+
+  -Data about changes in technology and policy in our time frame
+  
+-Create visualizations to address our research questions, do some serious wrangling and analysis
+
+
 ```{r}
  sessionInfo()
 ```
