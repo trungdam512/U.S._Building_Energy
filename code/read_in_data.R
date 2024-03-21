@@ -79,8 +79,8 @@ recs2015_cleaned <- recs2015 %>%
       EQUIPMUSE == 3 ~ "Program thermostat",
       EQUIPMUSE == 4 ~ "As needed",
       EQUIPMUSE == 5 ~ "No control",
-      EQUIPMUSE == 6 ~ "Other",
-      EQUIPMUSE == 7 ~ "Not applicable"
+      EQUIPMUSE == 9 ~ "Other",
+      EQUIPMUSE == -2 ~ "Not applicable"
     )
   )
 

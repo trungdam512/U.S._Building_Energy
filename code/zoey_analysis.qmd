@@ -9,16 +9,7 @@ recs <- readRDS("../data/recs_2015_cleaned.RDS")
 
 What impacts residential energy use across different cities and states?
 
-total btu by: 
-- METROMICRO
-- TYPEHUQ
-- YEARMADERANGE
-- HEATHOME
-- EQUIPUSE
-
-these are all categorical variables
-
-boxplots?
+In this section: investigating differences in total energy use between metropolitan and rural regions, different types of houses, different home ages, heating behavior, equipment usage, and geographic region. Graphs have not been styled.
 
 ```{r fig-btu-metromicro}
 recs %>% 
@@ -31,15 +22,21 @@ recs %>%
 recs %>% 
   ggplot(aes(x = housing_type, y = TOTALBTU)) +
   geom_boxplot() +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 10))
 ```
 ```{r fig-btu-year-made}
+recs$yearmade <- factor(recs$yearmade, levels = c(
+  "Before 1950", "1950 to 1959", "1960 to 1969", "1970 to 1979", "1980 to 1989", "1990 to 1999", "2000 to 2009", "2010 to 2015"
+))
 recs %>% 
   ggplot(aes(x = yearmade, y = TOTALBTU)) +
   geom_boxplot() +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45))
 ```
 ```{r fig-btu-home-heat}
+# does the home use space heating
 recs %>% 
   ggplot(aes(x = homeheat, y = TOTALBTU)) +
   geom_boxplot() +
@@ -53,12 +50,25 @@ recs %>%
   theme_minimal() 
 
 recs %>% 
+  filter(!is.na(equip_used_short),
+         # equip_used_short != "No control"
+         ) %>% 
   ggplot(aes(x = equip_used_short, y = TOTALBTU)) +
   geom_boxplot() +
   facet_wrap(vars(housing_type)) +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45))
+  theme(axis.text.x = element_text(angle = 90))
 ```
+We see in the initial graph that surprisingly, homes where the residents do not have control over their heating appear to use lower energy. When we disaggregate this variable by home type, however, this does not appear to be universally true. 
+
+```{r}
+# want: percentage of no-control homes that are also apartments
+recs %>% 
+  group_by(equip_used_short, housing_type) %>% 
+  summarize(n = n())
+
+```
+With a closer look at the data, we find that a relatively small proportion of households have no control over their equipment use, and of that proportion, over half live in large apartment buildings, which tend to have lower overall energy use. Our surprisingly low energy use for "no control" homes can thus be attributed to this correlation. If we disregard the "no control" and "NA" 
 
 ```{r fig-region-home-heat}
 recs %>% 
@@ -73,3 +83,4 @@ recs %>%
   theme_minimal()
 ```
 
+If we want to dive into regional differences, it might be useful to look at variables tracking cold, heat, and energy use for climate control. Might also be helpful to look at some general breakdowns of where this energy use comes from, but that might be difficult given how many factors there are. 
