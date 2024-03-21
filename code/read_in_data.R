@@ -59,6 +59,28 @@ recs2015_cleaned <- recs2015 %>%
       YEARMADERANGE == 6 ~ "1990 to 1999",
       YEARMADERANGE == 7 ~ "2000 to 2009",
       YEARMADERANGE == 8 ~ "2010 to 2015"
+    ),
+    homeheat = case_when(
+      HEATHOME == 1 ~ "Yes",
+      HEATHOME == 0 ~ "No"
+    ),
+    equip_used = case_when(
+      EQUIPMUSE == 1 ~ "Set one temperature and leave it there most of the time",
+      EQUIPMUSE == 2 ~ "Manually adjust the temperature at night or when no one is at home",
+      EQUIPMUSE == 3 ~ "Program the thermostat to automatically adjust the temperature during the day and night at certain times",
+      EQUIPMUSE == 4 ~ "Turn equipment on or off as needed",
+      EQUIPMUSE == 5 ~ "Our household does not have control over the equipment",
+      EQUIPMUSE == 6 ~ "Other",
+      EQUIPMUSE == 7 ~ "Not applicable"
+    ),
+    equip_used_short = case_when(
+      EQUIPMUSE == 1 ~ "One temp",
+      EQUIPMUSE == 2 ~ "Manually adjust",
+      EQUIPMUSE == 3 ~ "Program thermostat",
+      EQUIPMUSE == 4 ~ "As needed",
+      EQUIPMUSE == 5 ~ "No control",
+      EQUIPMUSE == 6 ~ "Other",
+      EQUIPMUSE == 7 ~ "Not applicable"
     )
   )
 

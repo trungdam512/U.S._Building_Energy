@@ -21,16 +21,8 @@ Metropolitan or Micropolitan Statistical Area by Region
 
 ```{r}
 recs %>%
-  mutate(
-    region_name = case_when(
-      REGIONC == 1 ~ "Northeast",
-      REGIONC == 2 ~ "Midwest",
-      REGIONC == 3 ~ "South",
-      REGIONC == 4 ~ "West"
-    )
-  ) %>% 
-  ggplot(aes(x = METROMICRO)) +
-    geom_bar(aes(fill = region_name), position = "dodge") +
+  ggplot(aes(x = region_name)) +
+    geom_bar(aes(fill = METROMICRO), position = "dodge") +
     theme_classic()
 ```
 
@@ -39,15 +31,6 @@ Histogram of housing type
 
 ```{r}
 recs %>% 
-  mutate(
-    housing_type = case_when(
-      TYPEHUQ == 1 ~ "Mobile home",
-      TYPEHUQ == 2 ~ "Single family detached",
-      TYPEHUQ == 3 ~ "Single family attached",
-      TYPEHUQ == 4 ~ "Apt small building",
-      TYPEHUQ == 5 ~ "Apt large building"
-    )
-  ) %>% 
   ggplot(aes(x = housing_type)) +
   geom_bar() +
   theme_classic() +

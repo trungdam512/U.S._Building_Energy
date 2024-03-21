@@ -1,0 +1,75 @@
+```{r libraries, echo = FALSE, message = FALSE}
+# load libraries and any relevant data here
+library(tidyverse)
+
+recs <- readRDS("../data/recs_2015_cleaned.RDS")
+```
+
+## Question 1
+
+What impacts residential energy use across different cities and states?
+
+total btu by: 
+- METROMICRO
+- TYPEHUQ
+- YEARMADERANGE
+- HEATHOME
+- EQUIPUSE
+
+these are all categorical variables
+
+boxplots?
+
+```{r fig-btu-metromicro}
+recs %>% 
+  ggplot(aes(x = METROMICRO, y = TOTALBTU)) +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+```{r fig-btu-huq}
+recs %>% 
+  ggplot(aes(x = housing_type, y = TOTALBTU)) +
+  geom_boxplot() +
+  theme_minimal()
+```
+```{r fig-btu-year-made}
+recs %>% 
+  ggplot(aes(x = yearmade, y = TOTALBTU)) +
+  geom_boxplot() +
+  theme_minimal()
+```
+```{r fig-btu-home-heat}
+recs %>% 
+  ggplot(aes(x = homeheat, y = TOTALBTU)) +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+```{r fig-btu-equipment-used}
+recs %>% 
+  ggplot(aes(x = equip_used_short, y = TOTALBTU)) +
+  geom_boxplot() +
+  theme_minimal() 
+
+recs %>% 
+  ggplot(aes(x = equip_used_short, y = TOTALBTU)) +
+  geom_boxplot() +
+  facet_wrap(vars(housing_type)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45))
+```
+
+```{r fig-region-home-heat}
+recs %>% 
+  ggplot(aes(x = region_name, y = TOTALBTU)) +
+  geom_boxplot() +
+  theme_minimal()
+
+recs %>% 
+  ggplot(aes(x = region_name, y = TOTALBTU)) +
+  geom_boxplot() +
+  facet_wrap(vars(homeheat)) +
+  theme_minimal()
+```
+
