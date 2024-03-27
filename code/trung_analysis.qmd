@@ -1,0 +1,28 @@
+```{r libraries, echo = FALSE, message = FALSE}
+# load libraries and any relevant data here
+library(tidyverse)
+library(stringr)
+library(lubridate)
+
+recs <- readRDS("../data/recs_2015_cleaned.RDS")
+weather <- read.csv("../data/2015 USA Weather Data FINAL.csv")
+region <- read.csv("../data/states.csv")
+```
+
+```{r cleaning weather}
+weather$State.abb <- str_remove_all(string = weather$State.abb, pattern ="\"")
+weather$State.name <- str_remove_all(string = weather$State.name, pattern ="\"")
+weather$Timestamp <- str_remove_all(string = weather$Timestamp, pattern ="\"")
+
+weather <- weather %>% left_join(region, by = c("State.name" = "State", "State.abb" = "State.Code")) %>% 
+  select(State.name, Region, AvgTemp, MaxTemp, MinTemp) %>% 
+  filter(!is.na(Region))
+
+temp_region <- weather %>% group_by(Region) %>% 
+  summarise(AvgTemp_region = mean(AvgTemp)) 
+
+```
+```{r temperature on total BTU}
+temp_BTU <- recs %>% left_join(weather, by = c("region_name" ="Region"))
+```
+
