@@ -66,3 +66,69 @@ main_plot2
 
 Looking closer to the usage of electricity, the South unsurprisingly consumes the most. This is likely because of their uses of AC to keep their house cool during hot weather. Whereas, the other regions contributes to much less electricity since they distribute their share of energy usage to natural gases and propane. 
 
+In conclusion, the location influences the total usage of energy source due to regional different temperature characteristics. However, it would be interesting to look into how weather conditions affect the energy efficiency level of a house, i.e. harsh weather hazards might wear the houses' conditions out.
+
+```{r move in intervals effect on energy effciency of houses}
+move_diff_effect <- recs %>% mutate(move_diff = OCCUPYYRANGE- YEARMADERANGE,
+                                    years_diff = 10 * move_diff)
+
+move_diff_effect %>% 
+  ggplot(aes(x = as.character(years_diff), y = TOTALDOL)) +
+  geom_boxplot() +
+  labs(title = "Impact of the gap between the construction year of a house and the year a family moves in on energy expenses ", x = "Gap (years)", y = "Total dollars spent ($)")+
+  theme_minimal()
+
+move_diff_effect %>% 
+  ggplot(aes(x = as.character(years_diff), y = TOTALBTU)) +
+  geom_boxplot() +
+  labs(title = "Impact of the gap between the construction year of a house and the year a family moves in on energy usage ", x = "Gap (years)", y = "Total dollars spent ($)")+
+  theme_minimal()
+```
+
+It seems like the bigger the gap between construction year and move-in year is, the less money a household have to pay for their energy. This might due to the fact that older houses are more likely to undergo upgrades, advancing their energy efficiency.  
+
+```{r move in intervals effect on energy effciency of houses in different regions}
+move_diff_effect %>% 
+  ggplot(aes(x = as.character(years_diff), y = TOTALDOL)) +
+  geom_boxplot() +
+  labs(title = "Impact of the gap between the construction year of a house and the year a family moves in on energy expenses in different regions",  x = "Gap (years)", y = "Total dollars spent ($)")+
+  facet_wrap(~ region_name) +
+  theme_minimal()
+```
+
+All regions' older houses have to pay less for energy usages. Specifically, the western households are shown to pay the least money for their energy. More investigation on differences in house architecture and efficiency among U.S. regions would help us gain a closer look to this phenomenon. 
+
+```{r move in intervals effect on energy effciency of houses among different housing types}
+move_diff_effect %>% 
+  ggplot(aes(x = as.character(years_diff), y = TOTALDOL)) +
+  geom_boxplot() +
+  labs(title = "Impact of the gap between the construction year of a house and the year a family moves in on energy expenses among different housing types",  x = "Gap (years)", y = "Total dollars spent ($)")+
+  facet_wrap(~ housing_type) +
+  theme_minimal()
+```
+
+```{r midwest on total usage of natural gas}
+move_diff_effect %>% filter(region_name == "Midwest") %>% 
+  ggplot(aes(x = yearmade, y = BTUNG)) +
+  geom_boxplot() +
+  labs(title = "Impact of the construction year on natural gas usage in the Midwest",  x = "Year Made", y = "Total natural gas usage (BTU)")+
+  theme_minimal()
+
+move_diff_effect %>% filter(region_name == "Midwest") %>% 
+  ggplot(aes(x = yearmade, y = BTUNG)) +
+  geom_boxplot() +
+  scale_x_discrete(guide  = guide_axis(angle = 90))+
+  labs(title = "Impact of the construction year on natural gas usage in the Midwest",  x = "Year Made", y = "Total natural gas usage (BTU)")+
+  facet_wrap(~ housing_type) +
+  theme_minimal()
+
+move_diff_effect %>% filter(region_name == "Midwest") %>% 
+  ggplot(aes(x = yearmade, y = BTUEL)) +
+  geom_boxplot() +
+  scale_x_discrete(guide  = guide_axis(angle = 90))+
+  labs(title = "Impact of the construction year on natural gas usage in the Midwest",  x = "Year Made", y = "Total natural gas usage (BTU)")+
+  facet_wrap(~ housing_type) +
+  theme_minimal()
+```
+
+It is not surprising that modern houses in the Midwest have better heat encapsulation, resulting in the lower usage of natural gas for heating. We further investigate the which housing type would be the most efficient for natural gas. Apartment large building seems to work really efficiently. However, this might because nowadays, apartment usually install two-way AC, so taking into account total electricity use would be helpful. 
