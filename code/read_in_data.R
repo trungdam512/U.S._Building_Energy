@@ -18,6 +18,13 @@ recs2015 <- read.csv("data/recs_2016/recs2015_public_v4.csv")
 # "TOTALBTU" and "TOTALDOL"
 # geographic/demographic: "REGIONC" through "TYPEHUQ"
 
+yesno_factor <- function(var){
+  case_when(
+        {{ var }} == 1 ~ "Yes",
+        {{ var }} == 0 ~ "No"
+      )
+}
+
 recs2015_cleaned <- recs2015 %>% 
   select(
     DOEID:TYPEHUQ,
@@ -34,7 +41,18 @@ recs2015_cleaned <- recs2015 %>%
     BTUFO,
     DOLLARFO,
     TOTALBTU,
-    TOTALDOL
+    TOTALDOL,
+    # heating details
+    ADQINSUL,
+    THERMAIN,
+    AIRCOND,
+    ELWARM,
+    ELCOOL,
+    ELWATER,
+    UGWARM,
+    UGWATER,
+    sqft_cooled = TOTCSQFT,
+    sqft_warmed = TOTHSQFT
   ) %>% 
   mutate(
     region_name = case_when(
@@ -60,10 +78,7 @@ recs2015_cleaned <- recs2015 %>%
       YEARMADERANGE == 7 ~ "2000 to 2009",
       YEARMADERANGE == 8 ~ "2010 to 2015"
     ),
-    homeheat = case_when(
-      HEATHOME == 1 ~ "Yes",
-      HEATHOME == 0 ~ "No"
-    ),
+    homeheat = yesno_factor(HEATHOME),
     equip_used = case_when(
       EQUIPMUSE == 1 ~ "Set one temperature and leave it there most of the time",
       EQUIPMUSE == 2 ~ "Manually adjust the temperature at night or when no one is at home",
@@ -71,7 +86,7 @@ recs2015_cleaned <- recs2015 %>%
       EQUIPMUSE == 4 ~ "Turn equipment on or off as needed",
       EQUIPMUSE == 5 ~ "Our household does not have control over the equipment",
       EQUIPMUSE == 6 ~ "Other",
-      EQUIPMUSE == 7 ~ "Not applicable"
+      EQUIPMUSE == 7 ~ NA
     ),
     equip_used_short = case_when(
       EQUIPMUSE == 1 ~ "One temp",
@@ -80,8 +95,60 @@ recs2015_cleaned <- recs2015 %>%
       EQUIPMUSE == 4 ~ "As needed",
       EQUIPMUSE == 5 ~ "No control",
       EQUIPMUSE == 9 ~ "Other",
-      EQUIPMUSE == -2 ~ "Not applicable"
-    )
+      EQUIPMUSE == -2 ~ NA
+    ),
+    adq_insulation = case_when(
+      ADQINSUL == 1 ~"Well insulated",
+      ADQINSUL == 2 ~"Adequately insulated",
+      ADQINSUL == 3 ~"Poorly insulated",
+      ADQINSUL == 4 ~"Not insulated"
+    ),
+    thermostat = case_when(
+      THERMAIN == 1 ~ "Yes",
+      THERMAIN == 0 ~ "No",
+      THERMAIN == -2 ~ NA
+    ),
+    aircon = yesno_factor(AIRCOND),
+    elec_warm = yesno_factor(ELWARM),
+    elec_cool = yesno_factor(ELCOOL),
+    elec_water = yesno_factor(ELWATER),
+    ng_warm = yesno_factor(UGWARM),
+    ng_water = yesno_factor(UGWATER)
+  ) %>% 
+  select(
+    ID = DOEID,
+    region_name,
+    census_div = DIVISION,
+    METROMICRO,
+    UATYP10,
+    housing_type,
+    yearmade,
+    OCCUPYYRANGE,
+    homeheat,
+    equip_used,
+    equip_used_short,
+    # heating details
+    adq_insulation,
+    thermostat,
+    aircon,
+    elec_warm,
+    elec_cool,
+    elec_water,
+    ng_warm,
+    ng_water,
+    sqft_cooled,
+    sqft_warmed,
+    # energy use
+    BTUEL,
+    DOLLAREL,
+    BTUNG,
+    DOLLARNG,
+    BTULP,
+    DOLLARLP,
+    BTUFO,
+    DOLLARFO,
+    TOTALBTU,
+    TOTALDOL
   )
 
 write_rds(recs2015_cleaned, "data/recs_2015_cleaned.RDS")
