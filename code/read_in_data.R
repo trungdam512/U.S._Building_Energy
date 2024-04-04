@@ -5,19 +5,6 @@ recs2015 <- read.csv("data/recs_2016/recs2015_public_v4.csv")
 
 # recs2020_1 <- readxl::read_xlsx("../data/HC 1.1.xlsx")
 
-
-# possibly relevant data:
-# total site electricity usage, "KWH"
-# "BTUEL" - total site electricity usage in BTU
-# "DOLLAREL" - total electricity cost in dollars
-# also look at cost for space heating and air conditioning? i just think that's interesting
-# "CUFEETNG" - NG usage in cubic feet
-# "BTUNG" and "DOLLARNG"
-# "BTULP" and "DOLLARLP" for propane
-# "BTUFO" and "DOLLARFO" for kerosene and fuel oil
-# "TOTALBTU" and "TOTALDOL"
-# geographic/demographic: "REGIONC" through "TYPEHUQ"
-
 yesno_factor <- function(var){
   case_when(
         {{ var }} == 1 ~ "Yes",
@@ -26,36 +13,6 @@ yesno_factor <- function(var){
 }
 
 recs2015_cleaned <- recs2015 %>% 
-  select(
-    DOEID:TYPEHUQ,
-    YEARMADERANGE,
-    OCCUPYYRANGE,
-    HEATHOME,
-    EQUIPMUSE,
-    BTUEL,
-    DOLLAREL,
-    BTUNG,
-    DOLLARNG,
-    BTULP,
-    DOLLARLP,
-    BTUFO,
-    DOLLARFO,
-    TOTALBTU,
-    TOTALDOL,
-    # heating details
-    ADQINSUL,
-    THERMAIN,
-    AIRCOND,
-    ELWARM,
-    ELCOOL,
-    ELWATER,
-    UGWARM,
-    UGWATER,
-    sqft_cooled = TOTCSQFT,
-    sqft_warmed = TOTHSQFT
-    # house type details
-    
-  ) %>% 
   mutate(
     region_name = case_when(
       REGIONC == 1 ~ "Northeast",
@@ -115,8 +72,24 @@ recs2015_cleaned <- recs2015 %>%
     elec_cool = yesno_factor(ELCOOL),
     elec_water = yesno_factor(ELWATER),
     ng_warm = yesno_factor(UGWARM),
-    ng_water = yesno_factor(UGWATER)
-  ) %>% 
+    ng_water = yesno_factor(UGWATER),
+    audit = yesno_factor(AUDIT),
+    audit_change = yesno_factor(AUDITCHG),
+    smart_meter = yesno_factor(SMARTMETER),
+    smart_meter_access = yesno_factor(INTDATA),
+    smart_meter_viewed = yesno_factor(INTDATAACC),
+    hh_income = case_when(
+      MONEYPY == 1 ~ "Less than $20,000",
+      MONEYPY == 2 ~ "$20,000 - $39,999",
+      MONEYPY == 3 ~ "$40,000 - $59,999",
+      MONEYPY == 4 ~ "$60,000 to $79,999",
+      MONEYPY == 5 ~ "$80,000 to $99,999",
+      MONEYPY == 6 ~ "$100,000 to $119,999",
+      MONEYPY == 7 ~ "$120,000 to $139,999",
+      MONEYPY == 8 ~ "$140,000 or more"
+    ),
+    energy_asst_prgm = yesno_factor(ENERGYASST)
+  ) %>%
   select(
     ID = DOEID,
     region_name,
@@ -138,8 +111,18 @@ recs2015_cleaned <- recs2015 %>%
     elec_water,
     ng_warm,
     ng_water,
-    sqft_cooled,
-    sqft_warmed,
+    sqft_cooled= TOTCSQFT,
+    sqft_warmed = TOTHSQFT,
+    # details
+    TOTROOMS,
+    TOTSQFT_EN,
+    audit,
+    audit_change,
+    smart_meter,
+    smart_meter_access,
+    smart_meter_viewed,
+    hh_income,
+    energy_asst_prgm,
     # energy use
     BTUEL,
     DOLLAREL,
