@@ -53,6 +53,8 @@ recs2015_cleaned <- recs2015 %>%
     UGWATER,
     sqft_cooled = TOTCSQFT,
     sqft_warmed = TOTHSQFT
+    # house type details
+    
   ) %>% 
   mutate(
     region_name = case_when(
