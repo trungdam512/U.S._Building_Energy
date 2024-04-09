@@ -78,6 +78,7 @@ recs2015_cleaned <- recs2015 %>%
     smart_meter = yesno_factor(SMARTMETER),
     smart_meter_access = yesno_factor(INTDATA),
     smart_meter_viewed = yesno_factor(INTDATAACC),
+    # update later with across()
     hh_income = case_when(
       MONEYPY == 1 ~ "Less than $20,000",
       MONEYPY == 2 ~ "$20,000 - $39,999",
