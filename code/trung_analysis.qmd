@@ -132,3 +132,18 @@ move_diff_effect %>% filter(region_name == "Midwest") %>%
 ```
 
 It is not surprising that modern houses in the Midwest have better heat encapsulation, resulting in the lower usage of natural gas for heating. We further investigate the which housing type would be the most efficient for natural gas. Apartment large building seems to work really efficiently. However, this might because nowadays, apartment usually install two-way AC, so taking into account total electricity use would be helpful. 
+
+
+```{r insulation and total electricity used}
+insulation_level <- c("Not insulated", "Poorly insulated", "Adequately insulated", "Well insulated")
+
+recs %>% filter(ng_warm == "Yes" & elec_warm == "No") %>%  ggplot(aes(x = fct_relevel(factor(adq_insulation), insulation_level), y = BTUNG))+
+  geom_boxplot()+
+  scale_x_discrete(guide  = guide_axis(angle = 90))+
+  facet_wrap(~ region_name)
+
+recs %>% filter(elec_warm == "Yes", elec_cool == "Yes") %>% ggplot(aes(x = housing_type, y = BTUEL))+
+  geom_boxplot()
+```
+
+This seems weird since households with no insulation seem to use less electricity to heat their house. Next move is to search in the data codebook to verify this.

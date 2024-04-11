@@ -99,9 +99,11 @@ recs2015_cleaned <- recs2015 %>%
     housing_type,
     yearmade,
     OCCUPYYRANGE,
+    YEARMADERANGE,
     homeheat,
     equip_used,
     equip_used_short,
+    ADQINSUL,
     # heating details
     adq_insulation,
     thermostat,
