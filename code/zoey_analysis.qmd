@@ -156,7 +156,14 @@ recs %>%
   geom_point() +
   geom_smooth(method = lm) +
   theme_minimal() 
+
+recs %>% 
+  ggplot(aes(x = TOTSQFT_EN, y = TOTALBTU, color = region_name)) +
+  geom_point() +
+  geom_smooth(method = lm) +
+  theme_minimal() 
 ```
+
 ```{r}
 recs$hh_income <- factor(recs$hh_income, levels = c(
   "Less than $20,000", "$20,000 - $39,999", "$40,000 - $59,999", "$60,000 to $79,999", "$80,000 to $99,999", "$100,000 to $119,999", "$120,000 to $139,999", "$140,000 or more"
@@ -216,6 +223,43 @@ purrr::map(lin_mod_results, summary)
 # summary(lm_cooled)
 # results are not significantly different 
 ```
+
+```{r}
+# linear models by region
+regions <- recs %>% pull(region_name) %>% unique()
+region_mod_results <- vector(mode = "list", length = length(regions))
+names(region_mod_results) <- regions
+
+for (i in seq_along(regions)) {
+    this_region <- regions[i]
+    recs_sub <- recs %>%
+        filter(region_name==this_region)
+    # The double square brackets [[i]] accesses the ith element of a list
+    region_mod_results[[i]] <- lm(TOTALBTU ~ TOTSQFT_EN, data = recs_sub)
+}
+
+purrr::map(region_mod_results, summary)
+
+```
+
+```{r}
+# linear models by census region
+census <- recs %>% pull(census_div) %>% unique()
+census_mod_results <- vector(mode = "list", length = length(census))
+names(census_mod_results) <- census
+
+for (i in seq_along(census)) {
+    this_region <- census[i]
+    recs_sub <- recs %>%
+        filter(census_div==this_region)
+    # The double square brackets [[i]] accesses the ith element of a list
+    census_mod_results[[i]] <- lm(TOTALBTU ~ TOTSQFT_EN, data = recs_sub)
+}
+
+purrr::map(census_mod_results, summary)
+
+```
+
 
 This linear model exploration finds that, based on $r^2$ scores, total square feet is a better predictor of energy use than the amount of square feet that are cooled or warmed in the building. Further analysis might investigate the impact of grouping variables on this model.
 

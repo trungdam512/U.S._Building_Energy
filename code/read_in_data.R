@@ -20,6 +20,18 @@ recs2015_cleaned <- recs2015 %>%
       REGIONC == 3 ~ "South",
       REGIONC == 4 ~ "West"
     ),
+    census_div = case_when(
+    DIVISION == 1 ~ "New England",
+    DIVISION == 2 ~ "Middle Atlantic",
+    DIVISION == 3 ~ "East North Central",
+    DIVISION == 4 ~ "West North Central",
+    DIVISION == 5 ~ "South Atlantic",
+    DIVISION == 6 ~ "East South Central",
+    DIVISION == 7 ~ "West South Central",
+    DIVISION == 8 ~ "Mountain North",
+    DIVISION == 9 ~ "Mountain South",
+    DIVISION == 10 ~ "Pacific"
+    ),
     housing_type = case_when(
       TYPEHUQ == 1 ~ "Mobile home",
       TYPEHUQ == 2 ~ "Single family detached",
@@ -94,7 +106,7 @@ recs2015_cleaned <- recs2015 %>%
   select(
     ID = DOEID,
     region_name,
-    census_div = DIVISION,
+    census_div,
     METROMICRO,
     UATYP10,
     housing_type,
