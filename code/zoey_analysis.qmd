@@ -318,3 +318,69 @@ recs %>%
   theme_minimal()
 ```
 
+# Final viz housing type
+
+```{r fig-btu-huq}
+recs %>% 
+  ggplot(aes(x = housing_type, y = TOTALBTU)) +
+  geom_boxplot() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 10))
+```
+
+```{r}
+# calculate energy use per sq ft
+recs %>% 
+  mutate(
+    btu_per_sqft = TOTALBTU/TOTSQFT_EN
+  ) %>% 
+  ggplot(aes(x = housing_type, y = btu_per_sqft)) +
+  geom_boxplot() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 10))
+  
+```
+
+```{r fig-housing-type}
+#| fig-cap: "Average energy use per household for each housing type, both total and per unit area. Although total energy use increases as density decreases, energy use per square foot shows less variance."
+
+# median btu per housing type
+avg_energy <- recs %>% 
+  group_by(housing_type) %>% 
+  summarize(avg_energy_use = mean(TOTALBTU))
+
+avg_sqft <- recs %>% 
+  mutate(
+    btu_per_sqft = TOTALBTU/TOTSQFT_EN
+  ) %>% 
+  group_by(housing_type) %>% 
+  summarize(avg_energy_per_sqft = mean(btu_per_sqft))
+
+avg_energy <- avg_energy %>% 
+  inner_join(avg_sqft, by = join_by(housing_type))
+
+coeff = 1/1000
+
+color_tot = "forest green"
+color_area = "light blue"
+
+avg_energy %>% 
+  ggplot(aes(x = housing_type)) +
+  geom_point(aes(y = avg_energy_use), color = color_tot, shape = 18,
+             size = 3) +
+  geom_point(aes(y = avg_energy_per_sqft / coeff), color = color_area) +
+  scale_y_continuous(
+    name = "Average total energy use (BTU)",
+    limits = c(0, 100000),
+    sec.axis = sec_axis(~.*coeff, name="Average energy use per sq. ft. (BTU)")
+  ) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45),
+        axis.title.y = element_text(color = color_tot, size = 9),
+        axis.title.y.right = element_text(color = color_area, angle = 90),
+        axis.text.y = element_text(color = color_tot),
+        axis.text.y.right = element_text(color = color_area)) +
+  labs(title = "Energy Use Disparities Across House Type") +
+  xlab("Housing type")
+```
+
