@@ -147,3 +147,30 @@ recs %>% filter(elec_warm == "Yes", elec_cool == "Yes") %>% ggplot(aes(x = housi
 ```
 
 This seems weird since households with no insulation seem to use less electricity to heat their house. Next move is to search in the data codebook to verify this.
+
+```{r}
+recs2015$tot %>% head(5)
+
+recs %>% group_by(region_name) %>% mutate(x = TOTALDOL/TOTALBTU) %>% select(region_name, x)
+
+recs$hh_income <- factor(recs$hh_income, levels = c(
+  "Less than $20,000", "$20,000 - $39,999", "$40,000 - $59,999", "$60,000 to $79,999", "$80,000 to $99,999", "$100,000 to $119,999", "$120,000 to $139,999", "$140,000 or more"
+))
+
+recs %>% ggplot(aes(x = hh_income, y = TOTSQFT_EN ))+
+  geom_boxplot()
+
+
+recs %>% filter(region_name == "Midwest") %>% group_by(elec_warm, ng_warm) %>% summarise(n = n(), totDOL = sum(TOTALDOL)) %>% mutate(price = totDOL/n)
+```
+```{r}
+recs %>% 
+  ggplot(aes(x = region_name, y = TOTALBTU)) +
+  geom_boxplot() +
+  facet_wrap(~ng_warm)+
+  theme_minimal()
+```
+```{r window }
+
+```
+

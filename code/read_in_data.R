@@ -116,6 +116,9 @@ recs2015_cleaned <- recs2015 %>%
     ng_water,
     sqft_cooled= TOTCSQFT,
     sqft_warmed = TOTHSQFT,
+    TEMPGONE,
+    TEMPHOME,
+    TEMPNITE
     # details
     TOTROOMS,
     TOTSQFT_EN,
