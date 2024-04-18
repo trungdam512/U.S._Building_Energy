@@ -4,7 +4,7 @@ format: html
 editor: visual
 ---
 
-```{r, echo=FALSE}
+```{r, message=FALSE}
 library(tidyverse)
 library(sf) # tools for working with spatial vector data (GIS functionality, mapping)
 library(terra)
@@ -15,7 +15,7 @@ library(tidyverse)
 library(purrr)
 ```
 
-```{r echo=FALSE}
+```{r message=FALSE}
 acs2015 <- tidycensus::get_acs(
     year = 2015,
     geography = "state",
@@ -48,6 +48,15 @@ acs2015_agg <- acs2015 %>%
   mutate(units_2_4 = unit_2 + unit_3_4,
          units_5_plus = unit_5_9 + unit_10_19 + unit_20_49 + unit_50_plus) %>% 
   filter(NAME != "Puerto Rico")
+
+
+acs2015_agg_region <- acs2015_agg %>% 
+  mutate(region = case_when(
+    NAME %in% c("Connecticut", "Maine", "Massachusetts", "New Hampshire", "Rhode Island", "Vermont", "New Jersey", "New York", "Pennsylvania") ~ "Northeast",
+    NAME %in% c("Illinois", "Indiana", "Michigan", "Ohio", "Wisconsin", "Iowa", "Kansas", "Minnesota", "Missouri", "Nebraska", "North Dakota", "South Dakota") ~ "Midwest",
+    NAME %in% c("Delaware", "Florida", "Georgia", "Maryland", "North Carolina", "South Carolina", "Virginia", "District of Columbia", "West Virginia", "Alabama", "Kentucky", "Mississippi", "Tennessee", "Arkansas", "Louisiana", "Oklahoma", "Texas") ~ "South",
+    NAME %in% c("Arizona", "Colorado", "Idaho", "Montana", "Nevada", "New Mexico", "Utah", "Wyoming", "Alaska", "California", "Hawaii", "Oregon","Washington") ~ "West",
+  ))
   
 ```
 
@@ -96,7 +105,7 @@ ggplot() +
   geom_sf(data = acs2015_agg, aes(fill = unit_1_detached/total_units)) +
       scale_fill_distiller(palette = "Purples", 
                        direction = 1) + 
-  labs(title = "Proportion of Single Unit Attached Homes, 2011-2015",
+  labs(title = "Proportion of Single Unit Detached Homes, 2011-2015",
        caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
        fill = "ACS estimate") + 
     ggthemes::theme_map()
@@ -129,14 +138,97 @@ recs <- readRDS("../data/recs_2015_cleaned.RDS")
 
 
 ```{r}
-recs_agg <- recs %>% 
+recs_housing_type <- recs %>% 
   count(region_name, housing_type) 
 
+region_means <- acs2015_agg_region %>% 
+  group_by(region) %>% 
+  select(-GEOID, -NAME) %>% 
+  summarise_all(mean)
 
-# recs_spatial <- acs2015_agg %>% 
-#   mutate(NAME = map_chr(NAME, str_split_i, pattern = " ", i = 1)) %>% 
-#   select(NAME, geometry) %>% 
-#   left_join(recs_agg, join_by(NAME == region_name))
+region_geometry <- region_means %>% 
+  select(region, geometry)
+
+recs_housing_spatial <- region_geometry %>%
+  left_join(recs_housing_type, join_by(region == region_name)) %>% 
+  group_by(region) %>% 
+  mutate(totalHousing = sum(n),
+         typeProportion = n/totalHousing)
 ```
 
+```{r}
+recs_housing_spatial %>% 
+  filter(housing_type == "Single family attached") %>% 
+  ggplot() +
+  geom_sf(aes(fill = typeProportion)) +
+      scale_fill_distiller(palette = "Purples", 
+                       direction = 1) + 
+  labs(title = "Proportion of Single Unit Attached Homes") + 
+    ggthemes::theme_map()
+
+recs_housing_spatial %>% 
+  filter(housing_type == "Single family detached") %>% 
+  ggplot() +
+  geom_sf(aes(fill = typeProportion)) +
+      scale_fill_distiller(palette = "Purples", 
+                       direction = 1) + 
+  labs(title = "Proportion of Single Unit Detached Homes") + 
+    ggthemes::theme_map()
+
+recs_housing_spatial %>% 
+  filter(housing_type == "Apt small building") %>% 
+ggplot() +
+  geom_sf(aes(fill = typeProportion)) +
+        scale_fill_distiller(palette = "Purples", 
+                       direction = 1) + 
+  labs(title = "Proportion of 2-4 Unit Homes",
+       fill = "Propotion of all housing in region") + 
+    ggthemes::theme_map()
+
+recs_housing_spatial %>% 
+  filter(housing_type == "Apt large building") %>% 
+ggplot() +
+  geom_sf(aes(fill = typeProportion)) +
+        scale_fill_distiller(palette = "Purples", 
+                       direction = 1) + 
+  labs(title = "Proportion of 5+ Unit Homes",
+       fill = "Propotion of all housing in region") + 
+    ggthemes::theme_map()
+
+
+```
+```{r}
+recs_temp <- recs %>% 
+  count(region_name, elec_warm, elec_cool) %>% 
+  mutate(
+  #   elec = case_when(
+  #   elec_cool =="Yes" & elec_warm == "Yes" ~ "Both",
+  #   elec_cool =="No" & elec_warm == "Yes" ~ "Just Warming",
+  #   elec_cool =="Yes" & elec_warm == "No" ~ "Just Cooling",
+  #   elec_cool =="No" & elec_warm == "No" ~ "Neither"
+  # )
+    
+  )
+
+recs_aircon <-recs %>% 
+  count(region_name, aircon) %>% 
+  group_by(region_name) %>% 
+  mutate(total = sum(n),
+         proportion_aircon = n/total) %>% 
+  filter(aircon == "Yes")
+
+ recs_aircon_geom <- region_geometry %>%
+  left_join(recs_aircon, join_by(region == region_name))
+  
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = recs_aircon_geom, aes(fill = proportion_aircon)) +
+        scale_fill_distiller(palette = "GnBu", 
+                       direction = 1) + 
+  labs(title = "Proportion of Homes with Air Conditioning",
+       fill = "Propotion") + 
+    ggthemes::theme_map()
+```
 
