@@ -160,11 +160,9 @@ ggplot() +
     ggthemes::theme_map()
 ```
 
-
 ```{r}
 recs <- readRDS("../data/recs_2015_cleaned.RDS")
 ```
-
 
 ```{r}
 recs_housing_type <- recs %>% 
@@ -230,6 +228,7 @@ ggplot() +
 
 
 ```
+
 ```{r}
 recs_temp <- recs %>% 
   count(region_name, elec_warm, elec_cool) %>% 
@@ -302,10 +301,6 @@ recs_btn <-recs %>%
     ggthemes::theme_map()
 ```
 
-
-
-
-
 ```{r}
 centers <- st_centroid(acs2015_agg, of_largest_polygon = TRUE)
 
@@ -340,4 +335,3 @@ ggplot() +
        fill = "Mean Natural \nGas Use\n(thousand Btu)") + 
     ggthemes::theme_map()
 ```
-

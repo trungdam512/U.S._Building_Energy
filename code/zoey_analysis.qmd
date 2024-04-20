@@ -342,9 +342,9 @@ recs %>%
 ```
 
 ```{r fig-housing-type}
-#| fig-cap: "Average energy use per household for each housing type, both total and per unit area. Although total energy use increases as density decreases, energy use per square foot shows less variance."
+#| fig-cap: "Average energy use per household for each housing type (from smallest to largest average unit size), both total and per unit area. Although total energy use increases as density decreases, energy use per square foot shows less variance."
 
-# median btu per housing type
+# get average energy use by housing type and average per square feet by housing type
 avg_energy <- recs %>% 
   group_by(housing_type) %>% 
   summarize(avg_energy_use = mean(TOTALBTU))
@@ -359,10 +359,19 @@ avg_sqft <- recs %>%
 avg_energy <- avg_energy %>% 
   inner_join(avg_sqft, by = join_by(housing_type))
 
+# scale coefficient for y-axis
 coeff = 1/1000
 
 color_tot = "forest green"
 color_area = "light blue"
+
+# by_sqft <- recs %>% 
+#   group_by(housing_type) %>% 
+#   summarize(sqft = mean(TOTSQFT_EN))
+
+#avg_energy$housing_type <- factor(avg_energy$housing_type, levels = ??)
+
+# summary(recs %>% filter(housing_type == "Single family attached") %>% pull(TOTSQFT_EN))
 
 avg_energy %>% 
   ggplot(aes(x = housing_type)) +
@@ -383,4 +392,6 @@ avg_energy %>%
   labs(title = "Energy Use Disparities Across House Type") +
   xlab("Housing type")
 ```
+
+homes to large mansions and spanning a range of floor areas from ```range(recs %>% filter(housing_type == "Apt small building") %>% pull(TOTSQFT_EN))[1]``` to 8,501 square feet. 
 
