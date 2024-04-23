@@ -1,0 +1,170 @@
+---
+title: "Analysis of US Building Energy Usage"
+author: 
+  - Trung Dam
+  - Lilabeth Sokolewicz
+  - Zoey Yandell
+bibliography: references.bib
+editor: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r libraries, echo = FALSE, message = FALSE}
+# load libraries and any relevant data here
+library(tidyverse)
+
+recs <- readRDS("../data/recs_2015_cleaned.RDS")
+```
+
+As we face an ever-intensifying climate crisis, the United States is finally beginning to take action.
+States like Minnesota have committed to reducing greenhouse gas emissions to net zero by 2050, and federal funding is being funneled to climate plans and emissions reduction projects across the country.
+In this effort, residential building energy is an essential piece of the puzzle.
+Residential emissions from both direct combustion and electricity use accounted for 19.1% of national greenhouse gas emissions in 2022 [@epa_inventory_2024].
+That makes it the third-largest contributor to greenhouse gasses, following transportation and industry.
+Reducing energy use and emissions from this sector is essential if we want to reach our sustainability goals for the future.
+
+In order to reduce energy use, we need to understand where and why energy use differs within the residential sector.
+What types of buildings use less energy?
+Where in the U.S. are there disparities in energy use?
+What purposes use the most electricity, or natural gas?
+A deeper understanding of the factors impacting energy consumption can give us a solid foundation to reduce that consumption.
+
+Residential energy is still a broad sector, however, and there are many possible factors to investigate.
+For this analysis, we chose to identify broad trends in energy use, and then investigate further.
+Rather than involving the many possible small factors, such as the use of specific appliances, or the amount of windows or rooms in a home, we wondered how more universal differences such as different regions, socioeconomic factors, or housing types predicted energy use.
+By drilling down into the sources of these disparities, we can better understand both where investments need to be made and where there are opportunities to make significant reductions in energy use.
+
+# Data Sources
+
+Our data, posted to Kaggle by Clayton Miller, was collected by the U.S.
+Energy Information Administration (EIA) in their 2015 cycle of the Residential Energy Consumption Survey (RECS).
+The EIA is the statistical office for the US Government's Department of Energy, providing "policy-independent data, forecasts, and analyses" to support legislative and public education around energy [@noauthor_what_2011].
+
+RECS surveys a nationally representative sample of 5,600 residential units for information on energy traits, including demographic and household characteristics.
+This is a somewhat limited sample size, raising the risk of greater errors and uncertainty.
+However, EIA used multistage area probability sample design, and claims that "all 118.2 million occupied primary households in the United States are represented by the sample" [@berry_recs_2018].
+It is still important to note that RECS sampled only homes occupied as primary residences, excluding vacant or seasonal homes, as well as group quarters like dormitories.
+The survey was not weather-adjusted, meaning that heating or cooling estimates could be skewed if it was an abnormally hot or cold spell during the collection period.
+
+EIA used in-person interviews as well as self-reported forms to collect household data.
+The survey also collected data from energy suppliers on household energy consumption and expenditures.
+Researchers cross-referenced billing data with responders' self-reported estimates to ensure higher accuracy.
+EIA also estimated consumption and expenditures estimates for end uses like heating and cooling with energy engineering-based models.
+RECS square footage estimates may not align with other sources, like the U.S.
+Census, because they are intended to represent only the energy-consuming space within a building.
+Accordingly, attics and garages are only included if they are heated or cooled [@berry_recs_2018].
+
+We also used data from the 2015 American Community Survey (ACS), a branch of the U.S.
+Census.
+It is collected continually via the internet, mail, telephone, and in-person interviews.
+It collects information on social, economic, and demographic characteristics of the American population, as well as housing characteristics.
+Similar to RECS, it is a sample survey that aims to represent the entire population yet surveys only around 3 million individuals per year.
+RECS data was only collected by region (South, West, Midwest, and New England), while we use ACS data at the state level in our analysis.
+ACS and RECS estimates of households by geographic region, housing type, and age match because RECS household weights are post-stratified to the ACS estimates [@berry_recs_2018].
+
+Throughout our analysis, we strive to be aware that conclusions drawn from the data might inadvertently generalize energy consumption patterns or overlook marginalized communities whose energy needs may differ.
+Moreover, the exclusion of certain types of residences, like dormitories and prisons, could skew perceptions of energy usage trends, leading to misguided policy recommendations or resource allocations.
+There are implications for not only homeowners but for policymakers, energy companies, and the broader public.
+To mitigate potential harm, collaborating with domain experts and community stakeholders can offer valuable perspectives and ensure that the research accounts for diverse experiences and needs.
+Further, promoting open dialogue and accountability can foster responsible decision-making and lower the risk of unintended harm.
+A thoughtful and inclusive approach is essential to reducing residential energy usage equitably.
+
+# Results
+
+## Regional Differences
+
+## Housing Types
+
+The RECS survey distinguishes between five different housing types: Large apartment building, small apartment building, mobile home, attached single family, and detached single family.
+Large apartments refer to apartments in buildings with 5 or more units, while small apartments are in buildings with 2-4 units.
+Single family attached refers to single family houses that share a wall or other element with a neighbor, such as townhomes.
+It is important to note that the data collected in this survey is per household rather than per building, which allows us to compare effectively between these different types of housing.
+
+The tension between high-density areas focused on large apartment buildings and sprawling, single-family neighborhoods has long been a staple of the United States landscape.
+Although most American cities were born in an era of walking, streetcars and carriages, when the majority of the city needed to be dense and close together in order to be accessible by these modes of transport, they continued to grow well into the automobile era.
+The ease of travel which cars facilitated made it possible for cities to spread out into automobile suburbs, large residential areas filled with detached single-family homes where residents commute by car to their jobs in city centers.
+The impact of the automobile era means that today, the majority of Americans live in detached, single-family homes, and many prefer it that way.
+Introduce a plan to develop more apartment buildings or increase density in residential areas, and you will often be met with intense backlash, as in the case of Minneapolis, MN's 2040 Comprehensive Plan (source).
+
+However, many planners and policy experts are pushing back against the supremacy of low-density building.
+Urban researchers argue that high-density neighborhoods, especially those that contain a wide variety of development types, encourage walking and biking and are associated with a lower use of cars, resulting both in less congestion and in fewer greenhouse gas emissions, while often building up a strong tax base for the community [@kackar_creating_2003].
+And more importantly, increased high-density housing can help cities address a housing crisis that frequently leaves the poor and most vulnerable in the lurch.
+
+Understanding the impacts of each of these types of housing on energy use can help inform these decisions further.
+They can show us the implications of both high-density development and our current low-density tendencies, complementing what we already know about the impacts of these development strategies on sustainable cities.
+
+### Findings
+
+The RECS data shows a clear trend across the housing categories. On average, higher-density (or smaller-unit) housing like apartments uses less energy than either single family category, and significantly less than single family detached buildings. However, it should be noted that the single family detached category is by far the broadest among the five, including anything from single-story homes to large mansions and spanning a range of floor areas from 317 to 8,501 square feet. 
+
+	Indeed, further analysis shows that much of the difference in energy usage between housing types can be explained by differences in size. The five categories each have fairly similar energy use per square foot of floor area. In fact, when normalized by floor area, single family homes and units in large apartment buildings have nearly the same energy use.
+	
+```{r fig-housing-type}
+#| fig-cap: "Average energy use per household for each housing type (from smallest to largest average unit size), both total and per unit area. Although total energy use increases as density decreases, energy use per square foot shows less variance."
+
+# get average energy use by housing type and average per square feet by housing type
+avg_energy <- recs %>% 
+  group_by(housing_type) %>% 
+  summarize(avg_energy_use = mean(TOTALBTU))
+
+avg_sqft <- recs %>% 
+  mutate(
+    btu_per_sqft = TOTALBTU/TOTSQFT_EN
+  ) %>% 
+  group_by(housing_type) %>% 
+  summarize(avg_energy_per_sqft = mean(btu_per_sqft))
+
+avg_energy <- avg_energy %>% 
+  inner_join(avg_sqft, by = join_by(housing_type))
+
+# scale coefficient for y-axis
+coeff = 1/1000
+
+color_tot = "forest green"
+color_area = "light blue"
+
+# by_sqft <- recs %>% 
+#   group_by(housing_type) %>% 
+#   summarize(sqft = mean(TOTSQFT_EN))
+
+#avg_energy$housing_type <- factor(avg_energy$housing_type, levels = ??)
+
+# summary(recs %>% filter(housing_type == "Single family attached") %>% pull(TOTSQFT_EN))
+
+avg_energy %>% 
+  ggplot(aes(x = housing_type)) +
+  geom_point(aes(y = avg_energy_use), color = color_tot, shape = 18,
+             size = 3) +
+  geom_point(aes(y = avg_energy_per_sqft / coeff), color = color_area) +
+  scale_y_continuous(
+    name = "Average total energy use (BTU)",
+    limits = c(0, 100000),
+    sec.axis = sec_axis(~.*coeff, name="Average energy use per sq. ft. (BTU)")
+  ) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45),
+        axis.title.y = element_text(color = color_tot, size = 9),
+        axis.title.y.right = element_text(color = color_area, angle = 90),
+        axis.text.y = element_text(color = color_tot),
+        axis.text.y.right = element_text(color = color_area)) +
+  labs(title = "Energy Use Disparities Across House Type") +
+  xlab("Housing type")
+```
+
+	So does that mean that single family homes are just as energy-efficient as apartments? Well, not really. The median size for a detached single family home is still [code], while for a unit in a large apartment building it is [code]. If, instead of large, multi-story homes we built more 900-sq-ft ones, then they might end up using similar amounts of energy. Although at that point, we’re still dealing with a space issue, so it might be more efficient to just stack these newly-single-story homes on top of each other, so we’re not being inefficient. And never mind, we just invented apartments again.
+	
+	The crux of the matter is that if we want to use less energy, we’re going to have to learn to take up less space. As cities grow, this becomes more and more essential, for a lot of compounding reasons - avoiding sprawl, increasing housing capacity, improving transit and quality of life. This data makes it clear that energy is another strogn factor in that list.
+
+
+## Geographic Trends
+
+Since square footage seems to be the biggest indicator of residential energy usage, let's look more closely at housing size across the country. States in the Midwest tend to have the largest homes, followed by New England. Since RECS data was collected to be compatible with the ACS, we can zoom into the state level of some RECS variables using ACS data. Here, we find that states in those areas, particularly New York, Massachusetts, New Jersey, and Illinois also tend to have older buildings. Houses in the South and West generally tend to be both newer and smaller. While this is all highly aggregated data, it could indicate a trend towards smaller residential buildings over time.
+
+[figure: Median Building Age and Square Footage by Region]
+
+Looking at size by number of units, single-unit detached homes dominate overall, although less so in New England. This is likely due to the presence of more compact cities like New York City and denser living zones overall. Single unit houses, unsurprisingly, also dominate by state. They seem least prevalent in states containing large metropolitan areas. Apartments and attached homes are relatively common in New England. Over a fifth of Rhode Island's housing is small apartments; New York, Connecticut, and New Jersey also have high proportions. Although not visible, around half of D.C.'s housing is large apartments, followed by New York, supporting the idea that cities tend to contain larger unit housing.
+
+[figure: state-level maps of housing unit proportions]
+
+Based on previous findings, we would expect Midwestern states to use more energy, and they do use more natural gas than other regions–likely for heating. The South uses noticeably more air conditioning than other regions. Overall, New England uses the most energy, followed by the Midwest.
