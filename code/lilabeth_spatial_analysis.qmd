@@ -63,25 +63,6 @@ centers <- st_centroid(acs2015_agg, of_largest_polygon = TRUE)
 ```
 
 ```{r}
-# ggplot() +
-#   geom_sf(data = acs2015, aes(fill = medContractRent)) +  
-#   scale_fill_distiller(palette = "Greens", 
-#                        direction = 1) + 
-#   labs(title = "Median Rent by State (Utilities Not Included), 2011-2015",
-#        caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-#        fill = "ACS estimate") + 
-#     ggthemes::theme_map()
-# 
-# ggplot() +
-#   geom_sf(data = acs2015, aes(fill = medianHomeValue)) +
-#   scale_fill_distiller(palette = "Greens", 
-#                        direction = 1) + 
-#   labs(title = "Median Home Value by State, 2011-2015",
-#        caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-#        fill = "ACS estimate") + 
-#     ggthemes::theme_map()
-# 
-# 
 ggplot() +
   geom_sf(data = acs2015, aes(fill = med_year_built)) +
     scale_fill_distiller(palette = "Greens",
@@ -231,6 +212,9 @@ ggplot() +
        fill = "Propotion of all housing in region") + 
     ggthemes::theme_map()
 ```
+<<<<<<< HEAD
+Single-unit detached homes dominate by region, although less so in New England, likely due to the presence of more compact cities like New York City. Single-unit attached and small apartments make up relatively larger proportions in New England, although are less common overall. Large apartments are common in New England and, interestingly, also the West- perhaps due to compact cities in California?
+=======
 
 ```{r}
 recs_temp <- recs %>% 
@@ -244,7 +228,7 @@ recs_temp <- recs %>%
   # )
     
   )
-
+```
 
 # What is the ACS estimate for distribution of housing type by state?
 ```{r}
@@ -402,6 +386,11 @@ btn_choropleth <- map_recs_var(
 btn_choropleth
 ```
 The Midwest uses notably more natural gas than other regions, followed by New England and the West.
+
+<<<<<<< HEAD
+
+
+# Multivariate Analysis
 
 ```{r}
 btn_choropleth +
