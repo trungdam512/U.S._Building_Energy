@@ -80,14 +80,14 @@ acs2015_agg_region <- acs2015_agg %>%
 #     ggthemes::theme_map()
 # 
 # 
-# ggplot() +
-#   geom_sf(data = acs2015, aes(fill = med_year_built)) +
-#     scale_fill_distiller(palette = "Greens", 
-#                        direction = 1) + 
-#   labs(title = "Median Year House Was Built by State, 2011-2015",
-#        caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-#        fill = "ACS estimate") + 
-#     ggthemes::theme_map()
+ggplot() +
+  geom_sf(data = acs2015, aes(fill = med_year_built)) +
+    scale_fill_distiller(palette = "Greens",
+                       direction = 1) +
+  labs(title = "Median Year House Was Built by State, 2011-2015",
+       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
+       fill = "ACS estimate") +
+    ggthemes::theme_map()
 
 
 
@@ -129,13 +129,40 @@ ggplot() +
        caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
        fill = "ACS estimate") + 
     ggthemes::theme_map()
-```
 
+#What's the distribution of owners versus renters?
+ggplot() +
+  geom_sf(data = acs2015_agg, aes(fill = tenureOwned/tenureTotal)) +
+  scale_fill_distiller(palette = "Greens",
+                       direction = 1) +
+  labs(title = "Proportion Owning",
+       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
+       fill = "ACS estimate") +
+    ggthemes::theme_map()
+
+ggplot() +
+  geom_sf(data = acs2015_agg, aes(fill = tenureRented/tenureTotal)) +
+  scale_fill_distiller(palette = "Greens",
+                       direction = 1) +
+  labs(title = "Proportion Owning",
+       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
+       fill = "ACS estimate") +
+    ggthemes::theme_map()
+
+#What's the median age of buildings by state?
+ggplot() +
+  geom_sf(data = acs2015_agg, aes(fill = med_year_built)) +
+    scale_fill_distiller(palette = "Greens",
+                       direction = -1) +
+  labs(title = "Median Building Age, 2011-2015",
+       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
+       fill = "Median Year Built") +
+    ggthemes::theme_map()
+```
 
 ```{r}
 recs <- readRDS("../data/recs_2015_cleaned.RDS")
 ```
-
 
 ```{r}
 recs_housing_type <- recs %>% 
@@ -163,6 +190,7 @@ recs_housing_spatial %>%
   geom_sf(aes(fill = typeProportion)) +
       scale_fill_distiller(palette = "Purples", 
                        direction = 1) + 
+      geom_sf(data = acs2015_agg, color = "darkgray", fill = NA) +
   labs(title = "Proportion of Single Unit Attached Homes") + 
     ggthemes::theme_map()
 
@@ -172,6 +200,7 @@ recs_housing_spatial %>%
   geom_sf(aes(fill = typeProportion)) +
       scale_fill_distiller(palette = "Purples", 
                        direction = 1) + 
+      geom_sf(data = acs2015_agg, color = "darkgray", fill = NA) +
   labs(title = "Proportion of Single Unit Detached Homes") + 
     ggthemes::theme_map()
 
@@ -181,6 +210,7 @@ ggplot() +
   geom_sf(aes(fill = typeProportion)) +
         scale_fill_distiller(palette = "Purples", 
                        direction = 1) + 
+      geom_sf(data = acs2015_agg, color = "darkgray", fill = NA) +
   labs(title = "Proportion of 2-4 Unit Homes",
        fill = "Propotion of all housing in region") + 
     ggthemes::theme_map()
@@ -191,12 +221,14 @@ ggplot() +
   geom_sf(aes(fill = typeProportion)) +
         scale_fill_distiller(palette = "Purples", 
                        direction = 1) + 
+      geom_sf(data = acs2015_agg, color = "darkgray", fill = NA) +
   labs(title = "Proportion of 5+ Unit Homes",
        fill = "Propotion of all housing in region") + 
     ggthemes::theme_map()
 
 
 ```
+
 ```{r}
 recs_temp <- recs %>% 
   count(region_name, elec_warm, elec_cool) %>% 
@@ -225,10 +257,81 @@ recs_aircon <-recs %>%
 ```{r}
 ggplot() +
   geom_sf(data = recs_aircon_geom, aes(fill = proportion_aircon)) +
-        scale_fill_distiller(palette = "GnBu", 
+        scale_fill_distiller(palette = "Blues", 
                        direction = 1) + 
+      geom_sf(data = acs2015_agg, color = "darkgray", fill = NA) +
   labs(title = "Proportion of Homes with Air Conditioning",
        fill = "Propotion") + 
     ggthemes::theme_map()
 ```
 
+```{r}
+recs_btu <-recs %>% 
+  group_by(region_name) %>% 
+  summarise(mean_btu = mean(BTUEL)) 
+
+ recs_btu_geom <- region_geometry %>%
+  left_join(recs_btu, join_by(region == region_name))
+ 
+ ggplot() +
+  geom_sf(data = recs_btu_geom, aes(fill = mean_btu)) +
+        scale_fill_distiller(palette = "Purples", 
+                       direction = 1) + 
+       geom_sf(data = acs2015_agg, color = "darkgray", fill = NA) +
+  labs(title = "Mean Electrity Usage by Region in 2015",
+       fill = "Mean Electricity \nUse (thousand \nBtu)") + 
+    ggthemes::theme_map()
+```
+
+```{r}
+recs_btn <-recs %>% 
+  group_by(region_name) %>% 
+  summarise(mean_btn = mean(BTUNG)) 
+
+ recs_btn_geom <- region_geometry %>%
+  left_join(recs_btn, join_by(region == region_name))
+ 
+ ggplot() +
+  geom_sf(data = recs_btn_geom, aes(fill = mean_btn)) +
+        scale_fill_distiller(palette = "Oranges", 
+                       direction = 1) + 
+       geom_sf(data = acs2015_agg, color = "darkgray", fill = NA) +
+  labs(title = "Mean Natural Gas Usage by Region in 2015",
+       fill = "Mean Natural \nGas Use\n(thousand Btu)") + 
+    ggthemes::theme_map()
+```
+
+```{r}
+centers <- st_centroid(acs2015_agg, of_largest_polygon = TRUE)
+
+ggplot() +
+  geom_sf(data = recs_btn_geom, aes(fill = mean_btn)) +
+        scale_fill_distiller(palette = "Oranges", 
+                       direction = 1) + 
+  geom_sf(data = acs2015_agg, color = "darkgray", fill = NA) +
+  geom_sf(data = centers, aes(size = med_year_built), color = "red") +
+  labs(title = "Mean Natural Gas Usage by Region in 2015",
+       fill = "Mean Natural \nGas Use\n(thousand Btu)") + 
+    ggthemes::theme_map()
+
+```
+
+```{r}
+recs_sqft <-recs %>% 
+  group_by(region_name) %>% 
+  summarise(mean_sqft = mean(TOTSQFT_EN)) 
+
+ recs_sqft_geom <- region_geometry %>%
+  left_join(recs_sqft, join_by(region == region_name))
+ 
+
+ggplot() +
+  geom_sf(data = recs_sqft_geom, aes(fill = mean_sqft)) +
+        scale_fill_distiller(palette = "Purples", 
+                       direction = 1) + 
+    geom_sf(data = acs2015_agg, color = "darkgray", fill = NA) +
+  geom_sf(data = centers, aes(size = med_year_built), color = "blue") +
+  labs(title = "Mean House Square Footage by Region in 2015",
+       fill = "Mean Natural \nGas Use\n(thousand Btu)") + 
+    ggthemes::theme_map()
+```
