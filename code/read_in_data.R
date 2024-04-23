@@ -78,6 +78,7 @@ recs2015_cleaned <- recs2015 %>%
     smart_meter = yesno_factor(SMARTMETER),
     smart_meter_access = yesno_factor(INTDATA),
     smart_meter_viewed = yesno_factor(INTDATAACC),
+    high_ceiling = yesno_factor(HIGHCEIL),
     # update later with across()
     hh_income = case_when(
       MONEYPY == 1 ~ "Less than $20,000",
@@ -105,6 +106,8 @@ recs2015_cleaned <- recs2015 %>%
     equip_used,
     equip_used_short,
     ADQINSUL,
+    WINDOWS,
+    high_ceiling,
     # heating details
     adq_insulation,
     thermostat,
@@ -118,7 +121,10 @@ recs2015_cleaned <- recs2015 %>%
     sqft_warmed = TOTHSQFT,
     TEMPGONE,
     TEMPHOME,
-    TEMPNITE
+    TEMPNITE,
+    summer_TEMPGONE = TEMPGONEAC,
+    summer_TEMPHOME =TEMPHOMEAC,
+    summer_TEMPNITE =TEMPNITEAC,
     # details
     TOTROOMS,
     TOTSQFT_EN,
