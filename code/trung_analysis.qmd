@@ -25,125 +25,247 @@ temp_region <- weather %>% group_by(Region) %>%
             AvgMinTemp = mean(MinTemp)) 
 ```
 
-```{r temperature on total BTU}
-x <- temp_region %>% ggplot(aes(x = Region, y = AvgTemp_region))+
-  geom_col(fill = "lightblue", width = 0.5)
+# ```{r temperature on total BTU}
+# x <- temp_region %>% ggplot(aes(x = Region, y = AvgTemp_region))+
+#   geom_col(fill = "lightblue", width = 0.5)
+# 
+# temp_region %>% ggplot(aes(x = Region, y = AvgMaxTemp))+
+#   geom_col(fill = "red")
+# 
+# temp_region %>% ggplot(aes(x = Region, y = AvgMinTemp))+
+#   geom_col(fill = "blue")
+# 
+# y <- recs %>% 
+#   ggplot(aes(x = region_name, y = TOTALBTU)) +
+#   geom_boxplot() +
+#   theme_minimal()
+# 
+# main_plot <- ggarrange(x, y, ncol = 2, nrow = 1, align = "v")
+# main_plot
+# ```
+# 
+# It is quite interesting how Southern states use less energy compared to Midwestern and Northeastern states despite its higher temperature. This might be due to higher use of natural gas, propane in colder states. It is also intriguing to look into housing efficiency differences between regions.
+# 
+# ```{r}
+# y1 <- recs %>% 
+#   ggplot(aes(x = region_name, y = BTUEL)) +
+#   geom_boxplot() +
+#   theme_minimal()
+# 
+# main_plot1 <- ggarrange(x, y1, ncol = 2, nrow = 1, align = "v")
+# main_plot1
+# 
+# y2 <- recs %>% 
+#   ggplot(aes(x = region_name, y = BTUNG)) +
+#   geom_boxplot() +
+#   theme_minimal()
+# 
+# main_plot2 <- ggarrange(x, y2, ncol = 2, nrow = 1, align = "v")
+# main_plot2
+# ```
+# 
+# Looking closer to the usage of electricity, the South unsurprisingly consumes the most. This is likely because of their uses of AC to keep their house cool during hot weather. Whereas, the other regions contributes to much less electricity since they distribute their share of energy usage to natural gases and propane. 
+# 
+# In conclusion, the location influences the total usage of energy source due to regional different temperature characteristics. However, it would be interesting to look into how weather conditions affect the energy efficiency level of a house, i.e. harsh weather hazards might wear the houses' conditions out.
+# 
+# ```{r move in intervals effect on energy effciency of houses}
+# move_diff_effect <- recs %>% mutate(move_diff = OCCUPYYRANGE- YEARMADERANGE,
+#                                     years_diff = 10 * move_diff)
+# 
+# move_diff_effect %>% 
+#   ggplot(aes(x = as.character(years_diff), y = TOTALDOL)) +
+#   geom_boxplot() +
+#   labs(title = "Impact of the gap between the construction year of a house and the year a family moves in on energy expenses ", x = "Gap (years)", y = "Total dollars spent ($)")+
+#   theme_minimal()
+# 
+# move_diff_effect %>% 
+#   ggplot(aes(x = as.character(years_diff), y = TOTALBTU)) +
+#   geom_boxplot() +
+#   labs(title = "Impact of the gap between the construction year of a house and the year a family moves in on energy usage ", x = "Gap (years)", y = "Total energy use (BTU)")+
+#   theme_minimal()
+# ```
+# 
+# It seems like the bigger the gap between construction year and move-in year is, the less money a household have to pay for their energy. This might due to the fact that older houses are more likely to undergo upgrades, advancing their energy efficiency.  
+# 
+# ```{r move in intervals effect on energy effciency of houses in different regions}
+# move_diff_effect %>% 
+#   ggplot(aes(x = as.character(years_diff), y = TOTALDOL)) +
+#   geom_boxplot() +
+#   labs(title = "Impact of the gap between the construction year of a house and the year a family moves in on energy expenses in different regions",  x = "Gap (years)", y = "Total dollars spent ($)")+
+#   facet_wrap(~ region_name) +
+#   theme_minimal()
+# ```
+# 
+# All regions' older houses have to pay less for energy usages. Specifically, the western households are shown to pay the least money for their energy. More investigation on differences in house architecture and efficiency among U.S. regions would help us gain a closer look to this phenomenon. 
+# 
+# ```{r move in intervals effect on energy effciency of houses among different housing types}
+# move_diff_effect %>% 
+#   ggplot(aes(x = as.character(years_diff), y = TOTALDOL)) +
+#   geom_boxplot() +
+#   labs(title = "Impact of the gap between the construction year of a house and the year a family moves in on energy expenses among different housing types",  x = "Gap (years)", y = "Total dollars spent ($)")+
+#   facet_wrap(~ housing_type) +
+#   theme_minimal()
+# ```
+# 
+# ```{r midwest on total usage of natural gas}
+# move_diff_effect %>% filter(region_name == "Midwest") %>% 
+#   ggplot(aes(x = yearmade, y = BTUNG)) +
+#   geom_boxplot() +
+#   labs(title = "Impact of the construction year on natural gas usage in the Midwest",  x = "Year Made", y = "Total natural gas usage (BTU)")+
+#   theme_minimal()
+# 
+# move_diff_effect %>% filter(region_name == "Midwest") %>% 
+#   ggplot(aes(x = yearmade, y = BTUNG)) +
+#   geom_boxplot() +
+#   scale_x_discrete(guide  = guide_axis(angle = 90))+
+#   labs(title = "Impact of the construction year on natural gas usage in the Midwest",  x = "Year Made", y = "Total natural gas usage (BTU)")+
+#   facet_wrap(~ housing_type) +
+#   theme_minimal()
+# 
+# move_diff_effect %>% filter(region_name == "Midwest") %>% 
+#   ggplot(aes(x = yearmade, y = BTUEL)) +
+#   geom_boxplot() +
+#   scale_x_discrete(guide  = guide_axis(angle = 90))+
+#   labs(title = "Impact of the construction year on natural gas usage in the Midwest",  x = "Year Made", y = "Total natural gas usage (BTU)")+
+#   facet_wrap(~ housing_type) +
+#   theme_minimal()
+# ```
+# 
+# It is not surprising that modern houses in the Midwest have better heat encapsulation, resulting in the lower usage of natural gas for heating. We further investigate the which housing type would be the most efficient for natural gas. Apartment large building seems to work really efficiently. However, this might because nowadays, apartment usually install two-way AC, so taking into account total electricity use would be helpful. 
+# 
+# 
+# ```{r insulation and total electricity used}
+# insulation_level <- c("Not insulated", "Poorly insulated", "Adequately insulated", "Well insulated")
+# 
+# recs %>% filter(ng_warm == "Yes" & elec_warm == "No") %>%  ggplot(aes(x = fct_relevel(factor(adq_insulation), insulation_level), y = BTUNG))+
+#   geom_boxplot()+
+#   scale_x_discrete(guide  = guide_axis(angle = 90))+
+#   facet_wrap(~ region_name)
+# 
+# recs %>% filter(elec_warm == "Yes", elec_cool == "Yes") %>% ggplot(aes(x = housing_type, y = BTUEL))+
+#   geom_boxplot()
+# ```
+# 
+# This seems weird since households with no insulation seem to use less electricity to heat their house. Next move is to search in the data codebook to verify this.
+# 
+# ```{r}
+# recs2015$tot %>% head(5)
+# 
+# recs %>% group_by(region_name) %>% mutate(x = TOTALDOL/TOTALBTU) %>% select(region_name, x)
+# 
+# recs$hh_income <- factor(recs$hh_income, levels = c(
+#   "Less than $20,000", "$20,000 - $39,999", "$40,000 - $59,999", "$60,000 to $79,999", "$80,000 to $99,999", "$100,000 to $119,999", "$120,000 to $139,999", "$140,000 or more"
+# ))
+# 
+# recs %>% ggplot(aes(x = hh_income, y = TOTSQFT_EN ))+
+#   geom_boxplot()
+# 
+# 
+# recs %>% filter(region_name == "Midwest") %>% group_by(elec_warm, ng_warm) %>% summarise(n = n(), totDOL = sum(TOTALDOL)) %>% mutate(price = totDOL/n)
+# ```
+# ```{r}
+# recs %>% 
+#   ggplot(aes(x = region_name, y = TOTALBTU)) +
+#   geom_boxplot() +
+#   facet_wrap(~ng_warm)+
+#   theme_minimal()
+# ```
+# ```{r window relationship with total efficiency}
+# #Zoey worked on it already --> found that total square foot is the main predictor for the variation
+# recs %>% mutate(housing_efficiency = TOTALBTU/TOTSQFT_EN) %>% ggplot(aes(x = housing_type, y = housing_efficiency))+
+#   geom_boxplot()
+# 
+# recs %>% mutate(housing_efficiency = TOTALBTU/TOTSQFT_EN) %>% ggplot(aes(x = region_name, y = housing_efficiency))+
+#   geom_boxplot()
+# ```
+# 
+# ```{r}
+# recs %>% ggplot(aes(x = factor(TOTROOMS), y = TOTALBTU)) + 
+#   geom_boxplot()
+# 
+# recs %>% mutate(btu_per_sqft = TOTALBTU/TOTSQFT_EN) %>% ggplot(aes(x = factor(TOTROOMS), y = btu_per_sqft)) +
+#   geom_boxplot()
+# ```
+# 
+# ```{r}
+# recs %>% group_by(WINDOWS) %>% summarise(n = n())
+# 
+# recs %>% mutate(btu_per_sqft = TOTALBTU/TOTSQFT_EN) %>%  ggplot(aes(x = factor(WINDOWS), y = btu_per_sqft))+
+#   geom_boxplot()+
+#   facet_wrap(~HIGHCEIL)
+# 
+# # The number of households that have more than 20+ windows are so small that it doens't show much  
+# ```
+# 
+# ```{r high ceiling}
+# recs %>% filter(!is.na(high_ceiling)) %>% mutate(btu_per_sqft = TOTALBTU/TOTSQFT_EN) %>% ggplot(aes(x = high_ceiling, y = TOTALBTU))+
+#   geom_boxplot()
+# ```
+# 
+# ```{r}
+# lm1 <- lm(formula = TOTALBTU ~ recs$TOTSQFT_EN + WINDOWS + high_ceiling + TEMPGONE + TEMPNITE + TOTROOMS, data = recs)
+# summary(lm1)
+# ```
 
-temp_region %>% ggplot(aes(x = Region, y = AvgMaxTemp))+
-  geom_col(fill = "red")
 
-temp_region %>% ggplot(aes(x = Region, y = AvgMinTemp))+
-  geom_col(fill = "blue")
+### Regional Differences
+My hypothesis is region that has:
+  1. better socioeconomic status, which is influenced by educational levels 
+  2. newer houses with stricter building codes and standards (insulation for heating and cooling)
+  3. moderate weather patterns, which leads to more energy efficiency
+  4. growing emergence of energy-efficient technologies and eco-conscious
+would use less energy. 
 
-y <- recs %>% 
-  ggplot(aes(x = region_name, y = TOTALBTU)) +
-  geom_boxplot() +
-  theme_minimal()
+```{r Number of household each category}
+region_yearMade <- recs %>% group_by(region_name, YEARMADERANGE) %>% summarise(n = n()) %>% mutate(per = n*100/sum(n))
 
-main_plot <- ggarrange(x, y, ncol = 2, nrow = 1, align = "v")
-main_plot
+ggplot(region_yearMade, aes(x = region_name, y = per, fill = as.character(YEARMADERANGE))) +
+  geom_bar(position = "fill", stat = "identity") +
+  labs(title = "Propotion of household's year origin by region")
 ```
 
-It is quite interesting how Southern states use less energy compared to Midwestern and Northeastern states despite its higher temperature. This might be due to higher use of natural gas, propane in colder states. It is also intriguing to look into housing efficiency differences between regions.
+Northeast is the region with oldest houses. This makes sense due to the high density population with limited land to build modern houses. 
+
+```{r Median household ages}
+recs %>% group_by(region_name, adq_insulation) %>% summarise(median_age = median(YEARMADERANGE), median_BTU = median(TOTALBTU/TOTSQFT_EN))
+```
+
+We observe similar trends of year range made of the houses and their insulation status. The more modern the house is, the better it gets insulated. However, only in the West, poorly insulated households seem to be built before not insulated households. This is quite interesting and can be due to some policy (more research later on this). I would think better insulated house would use less energy (in BTU). However, this is not necessarily true due the confounding effect of household sizes. Indeed, bigger houses regardless of its insulation status would be more likely to use more energy. Therefore, we calculated the median of energy used per square foot. The results show that our hypothesis is correct: better insulated households would use consume less energy per square foot. However, well insulated households in the Northeast tend to use a lot more energy per square foot compared to other regions. WHY? 
 
 ```{r}
-y1 <- recs %>% 
-  ggplot(aes(x = region_name, y = BTUEL)) +
-  geom_boxplot() +
-  theme_minimal()
-
-main_plot1 <- ggarrange(x, y1, ncol = 2, nrow = 1, align = "v")
-main_plot1
-
-y2 <- recs %>% 
-  ggplot(aes(x = region_name, y = BTUNG)) +
-  geom_boxplot() +
-  theme_minimal()
-
-main_plot2 <- ggarrange(x, y2, ncol = 2, nrow = 1, align = "v")
-main_plot2
-```
-
-Looking closer to the usage of electricity, the South unsurprisingly consumes the most. This is likely because of their uses of AC to keep their house cool during hot weather. Whereas, the other regions contributes to much less electricity since they distribute their share of energy usage to natural gases and propane. 
-
-In conclusion, the location influences the total usage of energy source due to regional different temperature characteristics. However, it would be interesting to look into how weather conditions affect the energy efficiency level of a house, i.e. harsh weather hazards might wear the houses' conditions out.
-
-```{r move in intervals effect on energy effciency of houses}
-move_diff_effect <- recs %>% mutate(move_diff = OCCUPYYRANGE- YEARMADERANGE,
-                                    years_diff = 10 * move_diff)
-
-move_diff_effect %>% 
-  ggplot(aes(x = as.character(years_diff), y = TOTALDOL)) +
-  geom_boxplot() +
-  labs(title = "Impact of the gap between the construction year of a house and the year a family moves in on energy expenses ", x = "Gap (years)", y = "Total dollars spent ($)")+
-  theme_minimal()
-
-move_diff_effect %>% 
-  ggplot(aes(x = as.character(years_diff), y = TOTALBTU)) +
-  geom_boxplot() +
-  labs(title = "Impact of the gap between the construction year of a house and the year a family moves in on energy usage ", x = "Gap (years)", y = "Total dollars spent ($)")+
-  theme_minimal()
-```
-
-It seems like the bigger the gap between construction year and move-in year is, the less money a household have to pay for their energy. This might due to the fact that older houses are more likely to undergo upgrades, advancing their energy efficiency.  
-
-```{r move in intervals effect on energy effciency of houses in different regions}
-move_diff_effect %>% 
-  ggplot(aes(x = as.character(years_diff), y = TOTALDOL)) +
-  geom_boxplot() +
-  labs(title = "Impact of the gap between the construction year of a house and the year a family moves in on energy expenses in different regions",  x = "Gap (years)", y = "Total dollars spent ($)")+
-  facet_wrap(~ region_name) +
-  theme_minimal()
-```
-
-All regions' older houses have to pay less for energy usages. Specifically, the western households are shown to pay the least money for their energy. More investigation on differences in house architecture and efficiency among U.S. regions would help us gain a closer look to this phenomenon. 
-
-```{r move in intervals effect on energy effciency of houses among different housing types}
-move_diff_effect %>% 
-  ggplot(aes(x = as.character(years_diff), y = TOTALDOL)) +
-  geom_boxplot() +
-  labs(title = "Impact of the gap between the construction year of a house and the year a family moves in on energy expenses among different housing types",  x = "Gap (years)", y = "Total dollars spent ($)")+
-  facet_wrap(~ housing_type) +
-  theme_minimal()
-```
-
-```{r midwest on total usage of natural gas}
-move_diff_effect %>% filter(region_name == "Midwest") %>% 
-  ggplot(aes(x = yearmade, y = BTUNG)) +
-  geom_boxplot() +
-  labs(title = "Impact of the construction year on natural gas usage in the Midwest",  x = "Year Made", y = "Total natural gas usage (BTU)")+
-  theme_minimal()
-
-move_diff_effect %>% filter(region_name == "Midwest") %>% 
-  ggplot(aes(x = yearmade, y = BTUNG)) +
-  geom_boxplot() +
-  scale_x_discrete(guide  = guide_axis(angle = 90))+
-  labs(title = "Impact of the construction year on natural gas usage in the Midwest",  x = "Year Made", y = "Total natural gas usage (BTU)")+
-  facet_wrap(~ housing_type) +
-  theme_minimal()
-
-move_diff_effect %>% filter(region_name == "Midwest") %>% 
-  ggplot(aes(x = yearmade, y = BTUEL)) +
-  geom_boxplot() +
-  scale_x_discrete(guide  = guide_axis(angle = 90))+
-  labs(title = "Impact of the construction year on natural gas usage in the Midwest",  x = "Year Made", y = "Total natural gas usage (BTU)")+
-  facet_wrap(~ housing_type) +
-  theme_minimal()
-```
-
-It is not surprising that modern houses in the Midwest have better heat encapsulation, resulting in the lower usage of natural gas for heating. We further investigate the which housing type would be the most efficient for natural gas. Apartment large building seems to work really efficiently. However, this might because nowadays, apartment usually install two-way AC, so taking into account total electricity use would be helpful. 
-
-
-```{r insulation and total electricity used}
-insulation_level <- c("Not insulated", "Poorly insulated", "Adequately insulated", "Well insulated")
-
-recs %>% filter(ng_warm == "Yes" & elec_warm == "No") %>%  ggplot(aes(x = fct_relevel(factor(adq_insulation), insulation_level), y = BTUNG))+
+recs %>% ggplot(aes(x = region_name, y = TOTALBTU/TOTSQFT_EN)) +
   geom_boxplot()+
-  scale_x_discrete(guide  = guide_axis(angle = 90))+
-  facet_wrap(~ region_name)
-
-recs %>% filter(elec_warm == "Yes", elec_cool == "Yes") %>% ggplot(aes(x = housing_type, y = BTUEL))+
-  geom_boxplot()
+  facet_wrap(~ adq_insulation)
 ```
 
-This seems weird since households with no insulation seem to use less electricity to heat their house. Next move is to search in the data codebook to verify this.
+Among four insulation statuses, Northeast uses the most energy per square foot. This can be due to higher residential density, resulting in more multifamily buildings than detached houses. Also, energy-related behavioral factors might play an important role in this trend.
+
+```{r energy-related behavioral}
+recs %>% group_by(region_name, adq_insulation) %>% summarise(med_tempgone = median(TEMPGONE), med_tempnite = median(TEMPNITE), med_temphome = median(TEMPHOME))
+
+lm_region_summary <- function(region, variables, df){
+  mod_formular_str <- str_c(region, "~", str_c(variables, collapse = "+"))
+  mod_form <- as.formula(mod_formular_str)
+  
+  lm <- lm(mod_form, df)
+  summary(lm)
+}
+
+lm(formula = region_name ~ TEMPGONE + TEMPHOME + TEMPNITE + summer_TEMPGONE + summer_TEMPHOME + summer_TEMPNITE, data = recs %>% filter(region_name == "West"))
+
+
+variables = c("TEMPGONE", "TEMPHOME", "TEMPNITE", "summer_TEMPGONE", "summer_TEMPHOME", "summer_TEMPNITE")
+
+lm_region_summary("region_name", variables = variables, df = recs %>% filter(region_name == "West"))
+```
+
+```{r weather related}
+region_temp <- recs %>% group_by(region_name) %>% summarise(energy_persqft = sum(TOTALBTU)/sum(TOTSQFT_EN)) %>% left_join(temp_region, by = c("region_name" = "Region"))
+
+lm <- lm(formula = energy_persqft ~ region_name + AvgMaxTemp + AvgMinTemp, data = region_temp)
+summary(lm)
+
+# How to create this model give what we have.
+```
+
+Compared between different regions, North East uses most energy per square foot 

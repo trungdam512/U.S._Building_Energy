@@ -156,7 +156,14 @@ recs %>%
   geom_point() +
   geom_smooth(method = lm) +
   theme_minimal() 
+
+recs %>% 
+  ggplot(aes(x = TOTSQFT_EN, y = TOTALBTU, color = region_name)) +
+  geom_point() +
+  geom_smooth(method = lm) +
+  theme_minimal() 
 ```
+
 ```{r}
 recs$hh_income <- factor(recs$hh_income, levels = c(
   "Less than $20,000", "$20,000 - $39,999", "$40,000 - $59,999", "$60,000 to $79,999", "$80,000 to $99,999", "$100,000 to $119,999", "$120,000 to $139,999", "$140,000 or more"
@@ -217,6 +224,43 @@ purrr::map(lin_mod_results, summary)
 # results are not significantly different 
 ```
 
+```{r}
+# linear models by region
+regions <- recs %>% pull(region_name) %>% unique()
+region_mod_results <- vector(mode = "list", length = length(regions))
+names(region_mod_results) <- regions
+
+for (i in seq_along(regions)) {
+    this_region <- regions[i]
+    recs_sub <- recs %>%
+        filter(region_name==this_region)
+    # The double square brackets [[i]] accesses the ith element of a list
+    region_mod_results[[i]] <- lm(TOTALBTU ~ TOTSQFT_EN, data = recs_sub)
+}
+
+purrr::map(region_mod_results, summary)
+
+```
+
+```{r}
+# linear models by census region
+census <- recs %>% pull(census_div) %>% unique()
+census_mod_results <- vector(mode = "list", length = length(census))
+names(census_mod_results) <- census
+
+for (i in seq_along(census)) {
+    this_region <- census[i]
+    recs_sub <- recs %>%
+        filter(census_div==this_region)
+    # The double square brackets [[i]] accesses the ith element of a list
+    census_mod_results[[i]] <- lm(TOTALBTU ~ TOTSQFT_EN, data = recs_sub)
+}
+
+purrr::map(census_mod_results, summary)
+
+```
+
+
 This linear model exploration finds that, based on $r^2$ scores, total square feet is a better predictor of energy use than the amount of square feet that are cooled or warmed in the building. Further analysis might investigate the impact of grouping variables on this model.
 
 # The influence of smart energy programs and interventions
@@ -273,4 +317,81 @@ recs %>%
   geom_boxplot() +
   theme_minimal()
 ```
+
+# Final viz housing type
+
+```{r fig-btu-huq}
+recs %>% 
+  ggplot(aes(x = housing_type, y = TOTALBTU)) +
+  geom_boxplot() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 10))
+```
+
+```{r}
+# calculate energy use per sq ft
+recs %>% 
+  mutate(
+    btu_per_sqft = TOTALBTU/TOTSQFT_EN
+  ) %>% 
+  ggplot(aes(x = housing_type, y = btu_per_sqft)) +
+  geom_boxplot() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 10))
+  
+```
+
+```{r fig-housing-type}
+#| fig-cap: "Average energy use per household for each housing type (from smallest to largest average unit size), both total and per unit area. Although total energy use increases as density decreases, energy use per square foot shows less variance."
+
+# get average energy use by housing type and average per square feet by housing type
+avg_energy <- recs %>% 
+  group_by(housing_type) %>% 
+  summarize(avg_energy_use = mean(TOTALBTU))
+
+avg_sqft <- recs %>% 
+  mutate(
+    btu_per_sqft = TOTALBTU/TOTSQFT_EN
+  ) %>% 
+  group_by(housing_type) %>% 
+  summarize(avg_energy_per_sqft = mean(btu_per_sqft))
+
+avg_energy <- avg_energy %>% 
+  inner_join(avg_sqft, by = join_by(housing_type))
+
+# scale coefficient for y-axis
+coeff = 1/1000
+
+color_tot = "forest green"
+color_area = "light blue"
+
+# by_sqft <- recs %>% 
+#   group_by(housing_type) %>% 
+#   summarize(sqft = mean(TOTSQFT_EN))
+
+#avg_energy$housing_type <- factor(avg_energy$housing_type, levels = ??)
+
+# summary(recs %>% filter(housing_type == "Single family attached") %>% pull(TOTSQFT_EN))
+
+avg_energy %>% 
+  ggplot(aes(x = housing_type)) +
+  geom_point(aes(y = avg_energy_use), color = color_tot, shape = 18,
+             size = 3) +
+  geom_point(aes(y = avg_energy_per_sqft / coeff), color = color_area) +
+  scale_y_continuous(
+    name = "Average total energy use (BTU)",
+    limits = c(0, 100000),
+    sec.axis = sec_axis(~.*coeff, name="Average energy use per sq. ft. (BTU)")
+  ) + 
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45),
+        axis.title.y = element_text(color = color_tot, size = 9),
+        axis.title.y.right = element_text(color = color_area, angle = 90),
+        axis.text.y = element_text(color = color_tot),
+        axis.text.y.right = element_text(color = color_area)) +
+  labs(title = "Energy Use Disparities Across House Type") +
+  xlab("Housing type")
+```
+
+homes to large mansions and spanning a range of floor areas from ```range(recs %>% filter(housing_type == "Apt small building") %>% pull(TOTSQFT_EN))[1]``` to 8,501 square feet. 
 
