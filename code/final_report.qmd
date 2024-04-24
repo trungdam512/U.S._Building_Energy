@@ -52,6 +52,9 @@ The EIA is the statistical office for the US Government's Department of Energy, 
 RECS surveys a nationally representative sample of 5,600 residential units for information on energy traits, including demographic and household characteristics.
 This is a somewhat limited sample size, raising the risk of greater errors and uncertainty.
 However, EIA used multistage area probability sample design, and claims that "all 118.2 million occupied primary households in the United States are represented by the sample" [@berry_recs_2018].
+
+![ ](lilabeth_spatial_analysis_files/RECSdatafig.png)
+
 It is still important to note that RECS sampled only homes occupied as primary residences, excluding vacant or seasonal homes, as well as group quarters like dormitories.
 The survey was not weather-adjusted, meaning that heating or cooling estimates could be skewed if it was an abnormally hot or cold spell during the collection period.
 
@@ -63,6 +66,8 @@ RECS square footage estimates may not align with other sources, like the U.S.
 Census, because they are intended to represent only the energy-consuming space within a building.
 Accordingly, attics and garages are only included if they are heated or cooled [@berry_recs_2018].
 
+![Areas included in RECS household square footage. Source: U.S. Energy Information Administration](lilabeth_spatial_analysis_files/RECSsqftfig.png)
+
 We also used data from the 2015 American Community Survey (ACS), a branch of the U.S.
 Census.
 It is collected continually via the internet, mail, telephone, and in-person interviews.
@@ -71,8 +76,8 @@ Similar to RECS, it is a sample survey that aims to represent the entire populat
 RECS data was only collected by region (South, West, Midwest, and New England), while we use ACS data at the state level in our analysis.
 ACS and RECS estimates of households by geographic region, housing type, and age match because RECS household weights are post-stratified to the ACS estimates [@berry_recs_2018].
 
-Throughout our analysis, we strive to be aware that conclusions drawn from the data might inadvertently generalize energy consumption patterns or overlook marginalized communities whose energy needs may differ.
-Moreover, the exclusion of certain types of residences, like dormitories and prisons, could skew perceptions of energy usage trends, leading to misguided policy recommendations or resource allocations.
+Throughout our analysis, we look to be aware that our conclusions might inadvertently generalize energy consumption patterns or overlook marginalized communities whose energy needs differ.
+Further, the exclusion of certain types of residences, like dormitories and prisons, could skew perceptions of energy usage trends and lead to misguided policy recommendations or resource allocations.
 There are implications for not only homeowners but for policymakers, energy companies, and the broader public.
 To mitigate potential harm, collaborating with domain experts and community stakeholders can offer valuable perspectives and ensure that the research accounts for diverse experiences and needs.
 Further, promoting open dialogue and accountability can foster responsible decision-making and lower the risk of unintended harm.
@@ -131,6 +136,8 @@ Although most American cities were born in an era of walking, streetcars and car
 The ease of travel which cars facilitated made it possible for cities to spread out into automobile suburbs, large residential areas filled with detached single-family homes where residents commute by car to their jobs in city centers.
 The impact of the automobile era means that today, the majority of Americans live in detached, single-family homes, and many prefer it that way.
 Introduce a plan to develop more apartment buildings or increase density in residential areas, and you will often be met with intense backlash, as in the case of Minneapolis, MN's 2040 Comprehensive Plan (source).
+
+![Deshler Park, Ohio. Source: Homes.com ](lilabeth_spatial_analysis_files/deshler-park.jpg)
 
 However, many planners and policy experts are pushing back against the supremacy of low-density building.
 Urban researchers argue that high-density neighborhoods, especially those that contain a wide variety of development types, encourage walking and biking and are associated with a lower use of cars, resulting both in less congestion and in fewer greenhouse gas emissions, while often building up a strong tax base for the community [@kackar_creating_2003].
