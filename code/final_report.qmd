@@ -20,12 +20,17 @@ library(tidyverse)
 recs <- readRDS("../data/recs_2015_cleaned.RDS")
 ```
 
+# Energy Data for Sustainable Planning
+
 As we face an ever-intensifying climate crisis, the United States is finally beginning to take action.
 States like Minnesota have committed to reducing greenhouse gas emissions to net zero by 2050, and federal funding is being funneled to climate plans and emissions reduction projects across the country.
 In this effort, residential building energy is an essential piece of the puzzle.
 Residential emissions from both direct combustion and electricity use accounted for 19.1% of national greenhouse gas emissions in 2022 [@epa_inventory_2024].
 That makes it the third-largest contributor to greenhouse gasses, following transportation and industry.
 Reducing energy use and emissions from this sector is essential if we want to reach our sustainability goals for the future.
+
+![From the EPA's Inventory of US Greenhouse Gas Emissions and Sinks: 1990-2022.](../results/us-ghg-bar.png)
+
 
 In order to reduce energy use, we need to understand where and why energy use differs within the residential sector.
 What types of buildings use less energy?
@@ -77,6 +82,43 @@ A thoughtful and inclusive approach is essential to reducing residential energy 
 
 ## Regional Differences
 
+We hypothesize that regions with better economic status, newer houses with stricter building codes and standards, and growing awareness of eco-conscious behavior would have higher energy efficiency.
+
+Due to the nature of this dataset, economic status is influenced by households' total income and educational level.
+We observe the trend of higher income households having better insulation status.
+Thus, we fitted a model examining the relationship between total energy used per square foot and educational level, household incomes, and its interaction with insulation status.
+Households with higher income and higher education will have better energy efficiency in their homes (p \< 0.05).
+On the other hand, although the interaction between household incomes and their insulation level demonstrates a positive trend with total use of energy per square foot, p-values are generally larger than 0.15, implying this correlation is not statistically significant.
+Breaking it down into four regions, we find it interesting that the relationship between higher income and higher energy efficiency per square foot is not statistically significant uniformly (p \> 0.05).
+However, households that have income less than \$20,000 tend to use more energy per square foot.
+Education level still has a significant negative relationship with energy efficiency as the lower educational level is, the more energy that households use.
+This suggests more intervention at state levels to educate households with low income and low educational level on how to efficiently use their energy.
+
+Investigating the modernity of houses among four regions, we notice that Northeast is the region with the oldest houses.
+This makes complete sense due to the high density population with limited land to build and reconstruct modern houses.
+Moreover, we discover similar trends of year range made of the houses and their insulation status.
+Indeed, the more modern the house is, the better it gets insulated.
+However, only in the West, poorly insulated households seem to be built before not insulated households.
+This is quite interesting and can be due to some policy (more research later on this).
+We would think that a better insulated house would use less energy (in BTU).
+However, this is not necessarily true due the confounding effect of household sizes.
+Particularly, bigger houses regardless of their insulation status would be more likely to use more energy.
+The data demonstrates that better insulated households would consume less energy per square foot.
+Nevertheless, well insulated households in the Northeast tend to use a lot more energy per square foot compared to other regions.
+This can be due to higher residential density, resulting in more multifamily buildings than detached houses.
+Also, energy-related behavioral factors might play an important role in this trend.
+
+Fitting models of energy-related behaviors among regions, we don't notice any statistical significant trend between total use of energy per square foot and temperature set during day, night in winter and summer in the Midwest and Northeast.
+On the other hand, in the South, during winter, if houses increase their temperature by 1 degree F during winter, they will increase 0.43 BTU energy per square foot.
+In the summer, if houses increase their temperature by 1 degree F, they will decrease 0.44 BTU energy per square foot.
+In the West, during winter, keeping temperature low when leaving the house would save around 0.35 BTU energy per square feet, whereas increasing temperature during home and at night results in higher energy usage.
+Furthermore, in the South, households that can manually adjust or program thermostats are more energy efficient.
+In the West, unabling to adjust household temperature causes more energy loss.
+This further suggests that the South and West houses should integrate manually adjusted heating and cooling systems to increase energy efficiency.
+
+In conclusion, regions with higher socioeconomic status, newer houses with better insulation would have better energy efficiency.
+At the same time, the data doesn't give any insights of energy-related behaviors in four regions.
+
 ## Housing Types
 
 The RECS survey distinguishes between five different housing types: Large apartment building, small apartment building, mobile home, attached single family, and detached single family.
@@ -99,11 +141,15 @@ They can show us the implications of both high-density development and our curre
 
 ### Findings
 
-The RECS data shows a clear trend across the housing categories. On average, higher-density (or smaller-unit) housing like apartments uses less energy than either single family category, and significantly less than single family detached buildings. However, it should be noted that the single family detached category is by far the broadest among the five, including anything from single-story homes to large mansions and spanning a range of floor areas from 317 to 8,501 square feet. 
+The RECS data shows a clear trend across the housing categories.
+On average, higher-density (or smaller-unit) housing like apartments uses less energy than either single family category, and significantly less than single family detached buildings.
+However, it should be noted that the single family detached category is by far the broadest among the five, including anything from single-story homes to large mansions and spanning a range of floor areas from 317 to 8,501 square feet.
 
-	Indeed, further analysis shows that much of the difference in energy usage between housing types can be explained by differences in size. The five categories each have fairly similar energy use per square foot of floor area. In fact, when normalized by floor area, single family homes and units in large apartment buildings have nearly the same energy use.
-	
-```{r fig-housing-type}
+Indeed, further analysis shows that much of the difference in energy usage between housing types can be explained by differences in size.
+The five categories each have fairly similar energy use per square foot of floor area.
+In fact, when normalized by floor area, single family homes and units in large apartment buildings have nearly the same energy use.
+
+```{r fig-housing-type, echo= FALSE}
 #| fig-cap: "Average energy use per household for each housing type (from smallest to largest average unit size), both total and per unit area. Although total energy use increases as density decreases, energy use per square foot shows less variance."
 
 # get average energy use by housing type and average per square feet by housing type
@@ -124,8 +170,8 @@ avg_energy <- avg_energy %>%
 # scale coefficient for y-axis
 coeff = 1/1000
 
-color_tot = "forest green"
-color_area = "light blue"
+color_tot = "#7566AE"
+color_area = "#DA4902"
 
 # by_sqft <- recs %>% 
 #   group_by(housing_type) %>% 
@@ -137,9 +183,9 @@ color_area = "light blue"
 
 avg_energy %>% 
   ggplot(aes(x = housing_type)) +
+  geom_point(aes(y = avg_energy_per_sqft / coeff), color = color_area, size = 3) +
   geom_point(aes(y = avg_energy_use), color = color_tot, shape = 18,
-             size = 3) +
-  geom_point(aes(y = avg_energy_per_sqft / coeff), color = color_area) +
+             size = 4) +
   scale_y_continuous(
     name = "Average total energy use (BTU)",
     limits = c(0, 100000),
@@ -155,21 +201,39 @@ avg_energy %>%
   xlab("Housing type")
 ```
 
-	So does that mean that single family homes are just as energy-efficient as apartments? Well, not really. The median size for a detached single family home is still [code], while for a unit in a large apartment building it is [code]. If, instead of large, multi-story homes we built more 900-sq-ft ones, then they might end up using similar amounts of energy. Although at that point, we’re still dealing with a space issue, so it might be more efficient to just stack these newly-single-story homes on top of each other, so we’re not being inefficient. And never mind, we just invented apartments again.
-	
-	The crux of the matter is that if we want to use less energy, we’re going to have to learn to take up less space. As cities grow, this becomes more and more essential, for a lot of compounding reasons - avoiding sprawl, increasing housing capacity, improving transit and quality of life. This data makes it clear that energy is another strogn factor in that list.
+So does that mean that single family homes are just as energy-efficient as apartments?
+Well, not really.
+The median size for a detached single family home is still \[code\], while for a unit in a large apartment building it is \[code\].
+If, instead of large, multi-story homes we built more 900-sq-ft ones, then they might end up using similar amounts of energy.
+Although at that point, we're still dealing with a space issue, so it might be more efficient to just stack these newly-single-story homes on top of each other, so we're not being inefficient.
+And never mind, we just invented apartments again.
 
+The crux of the matter is that if we want to use less energy, we're going to have to learn to take up less space.
+As cities grow, this becomes more and more essential, for a lot of compounding reasons - avoiding sprawl, increasing housing capacity, improving transit and quality of life.
+This data makes it clear that energy is another strong factor in that list.
 
 ## Geographic Trends
 
-Since square footage seems to be the biggest indicator of residential energy usage, let's look more closely at the relationship between housing size and energy consumption across different regions of the United States. States in the Midwest tend to have the largest homes, followed by those in New England. This aligns with our earlier observations regarding the prevalence of older buildings in these regions. Since RECS data was collected to be compatible with the ACS, we can dive deeper into the demographic and housing characteristics influencing energy usage patterns.
+Since square footage seems to be the biggest indicator of residential energy usage, let's look more closely at the relationship between housing size and energy consumption across different regions of the United States.
+States in the Midwest tend to have the largest homes, followed by those in New England.
+This aligns with our earlier observations regarding the prevalence of older buildings in these regions.
+Since RECS data was collected to be compatible with the ACS, we can dive deeper into the demographic and housing characteristics influencing energy usage patterns.
 
-![ ](lilabeth_spatial_analysis_files/figure-html/fig-age-sqft-1.png)
+![](lilabeth_spatial_analysis_files/figure-html/fig-age-sqft-1.png)
 
-Upon zooming into state-level variables derived from RECS and ACS data, we observe several trends. In states with generally larger residential buildings, such as New York, Massachusetts, New Jersey, and Illinois, the median building age tends to be older. Conversely, states in the South and West exhibit a trend towards newer and comparatively smaller residential buildings. While this data is all highly aggregated, it could indicate a trend towards smaller residential buildings over time- a hopeful possibility for reducing residential energy use.
+Upon zooming into state-level variables derived from RECS and ACS data, we observe several trends.
+In states with generally larger residential buildings, such as New York, Massachusetts, New Jersey, and Illinois, the median building age tends to be older.
+Conversely, states in the South and West exhibit a trend towards newer and comparatively smaller residential buildings.
+While this data is all highly aggregated, it could indicate a trend towards smaller residential buildings over time- a hopeful possibility for reducing residential energy use.
 
-![ ](lilabeth_spatial_analysis_files/figure-html/fig-mult-maps-1.png)
+![](lilabeth_spatial_analysis_files/figure-html/fig-mult-maps-1.png)
 
-Looking at size by number of units, single-unit detached homes dominate overall, although less so in New England, where apartments and attached homes are relatively common. This is likely due to the presence of denser living areas like New York City. Over a fifth of Rhode Island's housing is small apartments, and New York, Connecticut, and New Jersey also have high proportions. Although not visible, around half of D.C.'s housing is large apartments, followed by New York, supporting the idea that cities tend to contain larger unit housing.
+Looking at size by number of units, single-unit detached homes dominate overall, although less so in New England, where apartments and attached homes are relatively common.
+This is likely due to the presence of denser living areas like New York City.
+Over a fifth of Rhode Island's housing is small apartments, and New York, Connecticut, and New Jersey also have high proportions.
+Although not visible, around half of D.C.'s housing is large apartments, followed by New York, supporting the idea that cities tend to contain larger unit housing.
 
-The dominance of single-unit detached homes across most states demonstrates the necessity of addressing energy efficiency at the individual household level. However, variations in housing unit proportions, particularly in densely populated areas like New England, highlight the need for tailored policy interventions. As we work towards sustainability goals and climate resilience, policymakers must leverage these insights to develop targeted strategies for energy-efficient housing designs. Moving forward, an approach that integrates data-driven insights with strategic policy interventions is necessary to cultivate a more sustainable residential energy landscape.
+The dominance of single-unit detached homes across most states demonstrates the necessity of addressing energy efficiency at the individual household level.
+However, variations in housing unit proportions, particularly in densely populated areas like New England, highlight the need for tailored policy interventions.
+As we work towards sustainability goals and climate resilience, policymakers must leverage these insights to develop targeted strategies for energy-efficient housing designs.
+Moving forward, an approach that integrates data-driven insights with strategic policy interventions is necessary to cultivate a more sustainable residential energy landscape.
