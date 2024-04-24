@@ -50,6 +50,7 @@ acs2015_agg <- acs2015 %>%
          units_5_plus = unit_5_9 + unit_10_19 + unit_20_49 + unit_50_plus) %>% 
   filter(NAME != "Puerto Rico")
 
+centers <- st_centroid(acs2015_agg, of_largest_polygon = TRUE)
 
 acs2015_region <- acs2015_agg %>% 
   mutate(region = case_when(
@@ -58,94 +59,8 @@ acs2015_region <- acs2015_agg %>%
     NAME %in% c("Delaware", "Florida", "Georgia", "Maryland", "North Carolina", "South Carolina", "Virginia", "District of Columbia", "West Virginia", "Alabama", "Kentucky", "Mississippi", "Tennessee", "Arkansas", "Louisiana", "Oklahoma", "Texas") ~ "South",
     NAME %in% c("Arizona", "Colorado", "Idaho", "Montana", "Nevada", "New Mexico", "Utah", "Wyoming", "Alaska", "California", "Hawaii", "Oregon","Washington") ~ "West",
   ))
-  
-centers <- st_centroid(acs2015_agg, of_largest_polygon = TRUE)
 ```
 
-```{r}
-ggplot() +
-  geom_sf(data = acs2015, aes(fill = med_year_built)) +
-    scale_fill_distiller(palette = "Greens",
-                       direction = 1) +
-  labs(title = "Median Year House Was Built by State, 2011-2015",
-       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-       fill = "ACS estimate") +
-    ggthemes::theme_map()
-
-
-
-
-ggplot() +
-  geom_sf(data = acs2015_agg, aes(fill = unit_1_attached/total_units)) +
-      scale_fill_distiller(palette = "Purples", 
-                       direction = 1) + 
-  labs(title = "Proportion of Single Unit Attached Homes, 2011-2015",
-       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-       fill = "ACS estimate") + 
-    ggthemes::theme_map()
-
-ggplot() +
-  geom_sf(data = acs2015_agg, aes(fill = unit_1_detached/total_units)) +
-      scale_fill_distiller(palette = "Purples", 
-                       direction = 1) + 
-  labs(title = "Proportion of Single Unit Detached Homes, 2011-2015",
-       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-       fill = "ACS estimate") + 
-    ggthemes::theme_map()
-
-
-ggplot() +
-  geom_sf(data = acs2015_agg, aes(fill = units_2_4/total_units)) +
-        scale_fill_distiller(palette = "Purples", 
-                       direction = 1) + 
-  labs(title = "Proportion of 2-4 Unit Homes, 2011-2015",
-       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-       fill = "ACS estimate") + 
-    ggthemes::theme_map()
-
-
-ggplot() +
-  geom_sf(data = acs2015_agg, aes(fill = units_5_plus/total_units)) +
-        scale_fill_distiller(palette = "Purples", 
-                       direction = 1) + 
-  labs(title = "Proportion of 5+ Unit Homes, 2011-2015",
-       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-       fill = "ACS estimate") + 
-    ggthemes::theme_map()
-
-#What's the distribution of owners versus renters?
-ggplot() +
-  geom_sf(data = acs2015_agg, aes(fill = tenureOwned/tenureTotal)) +
-  scale_fill_distiller(palette = "Greens",
-                       direction = 1) +
-  labs(title = "Proportion Owning",
-       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-       fill = "ACS estimate") +
-    ggthemes::theme_map()
-
-ggplot() +
-  geom_sf(data = acs2015_agg, aes(fill = tenureRented/tenureTotal)) +
-  scale_fill_distiller(palette = "Greens",
-                       direction = 1) +
-  labs(title = "Proportion Owning",
-       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-       fill = "ACS estimate") +
-    ggthemes::theme_map()
-
-#What's the median age of buildings by state?
-ggplot() +
-  geom_sf(data = acs2015_agg, aes(fill = med_year_built)) +
-    scale_fill_distiller(palette = "Greens",
-                       direction = -1) +
-  labs(title = "Median Building Age, 2011-2015",
-       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-       fill = "Median Year Built") +
-    ggthemes::theme_map()
-```
-
-```{r}
-recs <- readRDS("../data/recs_2015_cleaned.RDS")
-```
 
 ```{r}
 recs_housing_type <- recs %>% 
@@ -212,23 +127,9 @@ ggplot() +
        fill = "Propotion of all housing in region") + 
     ggthemes::theme_map()
 ```
-<<<<<<< HEAD
-Single-unit detached homes dominate by region, although less so in New England, likely due to the presence of more compact cities like New York City. Single-unit attached and small apartments make up relatively larger proportions in New England, although are less common overall. Large apartments are common in New England and, interestingly, also the West- perhaps due to compact cities in California?
-=======
 
-```{r}
-recs_temp <- recs %>% 
-  count(region_name, elec_warm, elec_cool) %>% 
-  mutate(
-  #   elec = case_when(
-  #   elec_cool =="Yes" & elec_warm == "Yes" ~ "Both",
-  #   elec_cool =="No" & elec_warm == "Yes" ~ "Just Warming",
-  #   elec_cool =="Yes" & elec_warm == "No" ~ "Just Cooling",
-  #   elec_cool =="No" & elec_warm == "No" ~ "Neither"
-  # )
-    
-  )
-```
+Single-unit detached homes dominate by region, although less so in New England, likely due to the presence of more compact cities like New York City. Single-unit attached and small apartments make up relatively larger proportions in New England, although are less common overall. Large apartments are common in New England and, interestingly, also the West- perhaps due to compact cities in California?
+
 
 # What is the ACS estimate for distribution of housing type by state?
 ```{r}
@@ -271,7 +172,7 @@ ggplot() +
 Single unit houses, unsuprisingly, also dominate by state. They seem least prevalent in New York and Massachusets, and make up a somewhat lower proportion in Illinois, California, Nevada, and North Dakota. Pennsylvania and Maryland contain an intriguingly high proportion of single-unit attached houses. Over a fifth of Rhode Island's housing is small apartments; New York, Connecticut, and New Jersey also have high proportions. Although not visible, around half of D.C.'s housing is large apartments, followed by New York, supporting the idea that cities tend to contain larger unit housing.
 
 
-Who rents vs owns by state?
+#Who rents vs owns by state?
 ```{r}
 ggplot() +
   geom_sf(data = acs2015_agg, aes(fill = tenureOwned/tenureTotal)) +
@@ -293,7 +194,7 @@ ggplot() +
 ```
 Generally, owning is more common then renting. The exceptions to this rule are New York, Calfornia, and Nevada- states with big cities. 
 
-#What's the median age of buildings by state?
+# What's the median age of buildings by state?
 ```{r}
 ggplot() +
   geom_sf(data = acs2015_agg, aes(fill = med_year_built)) +
@@ -303,9 +204,8 @@ ggplot() +
        caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
        fill = "Median Year Built") +
     ggthemes::theme_map()
-# Midwest, NE buildings tend to be older
 ```
-Nevada has the newest buildings. Houses in the South and West generally tend to be newer. Houses in New York are oldest, along with several states in New England and the Midwest= notable Illinois, Iowa, and Ohio. 
+Nevada has the newest buildings. Houses in the South and West generally tend to be newer. Houses in New York are oldest, along with several states in New England and the Midwest- notably Illinois, Iowa, and Ohio. 
 
 
 ```{r}
@@ -328,7 +228,7 @@ map_recs_var <- function(var, df, title, legend_title, palette) {
 ```
 
 
-What regions' houses have air conditioning?
+## What regions' houses have air conditioning?
 ```{r}
 recs_aircon <- recs %>%
   count(region_name, aircon) %>%
@@ -349,8 +249,25 @@ aircon_choropleth
 ```
 Air conditioning is nearly universal in the South, and is almost as common in the Midwest. Its prevalence drops to around 80% in New England, and down to 75% in the West. 
 
+# Which regions use more energy?
+```{r}
+recs_tot_energy <- recs %>%
+  group_by(region_name) %>%
+  summarise(mean_tot_en = mean(TOTALBTU))
 
-Which regions use more electricity?
+tot_energy_choropleth <- map_recs_var(
+  mean_tot_en,
+  recs_tot_energy,
+  "Mean Energy Use by Region in 2015",
+  "Mean Total Energy",
+  "Reds"
+) 
+
+tot_energy_choropleth
+```
+New England and the Midwest overall use the most energy, followed by the South, with the West using least. 
+
+## Which regions use more electricity?
 ```{r}
 recs_btu <- recs %>% 
   group_by(region_name) %>% 
@@ -369,7 +286,7 @@ recs_btu <- recs %>%
 The South uses noticeably more air conditioning than other regions. 
 
 
-What about natural gas?
+## What about natural gas?
 ```{r}
 recs_btn <-recs %>% 
   group_by(region_name) %>% 
@@ -387,7 +304,6 @@ btn_choropleth
 ```
 The Midwest uses notably more natural gas than other regions, followed by New England and the West.
 
-<<<<<<< HEAD
 
 
 # Multivariate Analysis
@@ -421,3 +337,9 @@ sqft_choropleth +
     scale_size(range = c(.5, 6)) +
   labs(size = "Median Year Built")
 ```
+
+
+
+split data into other file
+<!-- Add Data sources -->
+combine unit maps into one figure
