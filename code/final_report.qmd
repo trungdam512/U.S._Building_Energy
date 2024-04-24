@@ -4,10 +4,13 @@ author:
   - Trung Dam
   - Lilabeth Sokolewicz
   - Zoey Yandell
-bibliography: references.bib
+bibliography: ../references.bib
 editor: 
   markdown: 
     wrap: sentence
+format: 
+  html:
+    self-contained: true
 ---
 
 ```{r libraries, echo = FALSE, message = FALSE}
@@ -159,12 +162,14 @@ avg_energy %>%
 
 ## Geographic Trends
 
-Since square footage seems to be the biggest indicator of residential energy usage, let's look more closely at housing size across the country. States in the Midwest tend to have the largest homes, followed by New England. Since RECS data was collected to be compatible with the ACS, we can zoom into the state level of some RECS variables using ACS data. Here, we find that states in those areas, particularly New York, Massachusetts, New Jersey, and Illinois also tend to have older buildings. Houses in the South and West generally tend to be both newer and smaller. While this is all highly aggregated data, it could indicate a trend towards smaller residential buildings over time.
+Since square footage seems to be the biggest indicator of residential energy usage, let's look more closely at the relationship between housing size and energy consumption across different regions of the United States. States in the Midwest tend to have the largest homes, followed by those in New England. This aligns with our earlier observations regarding the prevalence of older buildings in these regions. Since RECS data was collected to be compatible with the ACS, we can dive deeper into the demographic and housing characteristics influencing energy usage patterns.
 
-[figure: Median Building Age and Square Footage by Region]
+![ ](lilabeth_spatial_analysis_files/figure-html/fig-age-sqft-1.png)
 
-Looking at size by number of units, single-unit detached homes dominate overall, although less so in New England. This is likely due to the presence of more compact cities like New York City and denser living zones overall. Single unit houses, unsurprisingly, also dominate by state. They seem least prevalent in states containing large metropolitan areas. Apartments and attached homes are relatively common in New England. Over a fifth of Rhode Island's housing is small apartments; New York, Connecticut, and New Jersey also have high proportions. Although not visible, around half of D.C.'s housing is large apartments, followed by New York, supporting the idea that cities tend to contain larger unit housing.
+Upon zooming into state-level variables derived from RECS and ACS data, we observe several trends. In states with generally larger residential buildings, such as New York, Massachusetts, New Jersey, and Illinois, the median building age tends to be older. Conversely, states in the South and West exhibit a trend towards newer and comparatively smaller residential buildings. While this data is all highly aggregated, it could indicate a trend towards smaller residential buildings over time- a hopeful possibility for reducing residential energy use.
 
-[figure: state-level maps of housing unit proportions]
+![ ](lilabeth_spatial_analysis_files/figure-html/fig-mult-maps-1.png)
 
-Based on previous findings, we would expect Midwestern states to use more energy, and they do use more natural gas than other regions–likely for heating. The South uses noticeably more air conditioning than other regions. Overall, New England uses the most energy, followed by the Midwest.
+Looking at size by number of units, single-unit detached homes dominate overall, although less so in New England, where apartments and attached homes are relatively common. This is likely due to the presence of denser living areas like New York City. Over a fifth of Rhode Island's housing is small apartments, and New York, Connecticut, and New Jersey also have high proportions. Although not visible, around half of D.C.'s housing is large apartments, followed by New York, supporting the idea that cities tend to contain larger unit housing.
+
+The dominance of single-unit detached homes across most states demonstrates the necessity of addressing energy efficiency at the individual household level. However, variations in housing unit proportions, particularly in densely populated areas like New England, highlight the need for tailored policy interventions. As we work towards sustainability goals and climate resilience, policymakers must leverage these insights to develop targeted strategies for energy-efficient housing designs. Moving forward, an approach that integrates data-driven insights with strategic policy interventions is necessary to cultivate a more sustainable residential energy landscape.
