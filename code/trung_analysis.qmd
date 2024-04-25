@@ -232,8 +232,9 @@ insulation_level <- c("Not insulated", "Poorly insulated", "Adequately insulated
 
 ggplot(income_insul, aes(x = fct_relevel(factor(hh_income), income_level), y = per, fill = fct_relevel(factor(adq_insulation), insulation_level))) +
   geom_bar(position = "fill", stat = "identity") +
-  theme(axis.text.x = element_text(angle = 45))
-  labs(title = "Propotion of household's year origin by region")
+  labs(title = "Insulation level among different household incomes", x = "Household Incomes", y = "Frequency", fill = "Insulation level")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
 
 summary(lm(formula = energy_persqft ~ hh_income*adq_insulation + EDUCATION,data = socioeconomic_status))
 ```
@@ -254,6 +255,14 @@ summary(northeast)
 
 Breaking down into four regions, it is quite interesting that the relationship between higher income and higher energy efficiency per square foot is not statistically significant (p > 0.05). However, household that have income less than $20,000 tend to use more energy per square foot. Education level is still have a negative relationship with energy efficiency as the lower educational level is, the more energy that households use. This suggests more intervention at state levels to educate household with low income and low educational level on how to efficiently use their energy.
 
+```{r Education level}
+socioeconomic_status %>% ggplot(aes(x = factor(EDUCATION), y = energy_persqft))+
+  geom_boxplot()+
+  labs(title = "Energy use per square foot among different educational levels", x = "Education Levels", y = "Energy per square foot")+
+  theme_minimal()
+  
+```
+
 ```{r Number of household each category}
 region_yearMade <- recs %>% group_by(region_name, YEARMADERANGE) %>% summarise(n = n()) %>% mutate(per = n*100/sum(n))
 
@@ -273,7 +282,9 @@ We observe similar trends of year range made of the houses and their insulation 
 ```{r}
 recs %>% ggplot(aes(x = region_name, y = TOTALBTU/TOTSQFT_EN)) +
   geom_boxplot()+
-  facet_wrap(~ adq_insulation)
+  facet_wrap(~ adq_insulation)+
+  labs(title = "Regional energy use discrepances among different insulation levels", x = "Region", y = "Energy per square foot")+
+  theme_minimal()
 ```
 
 Among four insulation statuses, Northeast uses the most energy per square foot. This can be due to higher residential density, resulting in more multifamily buildings than detached houses. Also, energy-related behavioral factors might play an important role in this trend.
