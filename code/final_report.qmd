@@ -16,8 +16,12 @@ format:
 ```{r libraries, echo = FALSE, message = FALSE}
 # load libraries and any relevant data here
 library(tidyverse)
+library(sf) 
+library(ggpubr)
 
 recs <- readRDS("../data/recs_2015_cleaned.RDS")
+
+acs <- readRDS("../data/acs_2015_cleaned.RDS")
 ```
 
 # Energy Data for Sustainable Planning
@@ -257,19 +261,103 @@ States in the Midwest tend to have the largest homes, followed by those in New E
 This aligns with our earlier observations regarding the prevalence of older buildings in these regions.
 Since RECS data was collected to be compatible with the ACS, we can dive deeper into the demographic and housing characteristics influencing energy usage patterns.
 
-![](lilabeth_spatial_analysis_files/figure-html/fig-age-sqft-1.png)
+```{r echo=FALSE}
+# Get the geometry from ACS data to join to RECS
+region_geometry <- acs %>%
+  group_by(region) %>%
+  select(-GEOID,-NAME) %>%
+  summarise_all(mean) %>%
+  select(region, geometry)
+
+# Add geometry to a summary of a RECS variable and map it 
+geom_map_var <- function(var, df, title, legend_title, palette) {
+  data_geom <- region_geometry %>%
+    left_join(df, join_by(region == region_name))
+  
+  ggplot() +
+    geom_sf(data = data_geom, aes(fill = {{var}})) +
+    scale_fill_distiller(palette = palette,
+                         direction = 1) +
+    geom_sf(data = acs,
+            color = "darkgray",
+            fill = NA) +
+    labs(title = title,
+         fill = legend_title) +
+    ggthemes::theme_map()
+}
+
+# aggregate RECS data for mapping
+recs_sqft <- recs %>%
+  group_by(region_name) %>%
+  summarise(mean_sqft = mean(TOTSQFT_EN))
+
+# create choropleth map of square footage by region
+sqft_choropleth <- geom_map_var(
+  mean_sqft,
+  recs_sqft,
+  "Median Building Age and Square Footage of Residential Buildings by Region in 2015",
+  "Mean Square Feet",
+  "Purples"
+) 
+
+# prepare acs data for mapping
+centers <- st_centroid(acs, of_largest_polygon = TRUE)
+
+# add graduated symbols for building age
+sqft_choropleth +
+  geom_sf(data = centers, aes(size = med_year_built), color = "blue") +
+    scale_size(range = c(.5, 6)) +
+  labs(size = "Median Year Built",
+       caption = "Data sources: 2011-2015 ACS, US Census Bureau; 2015 RECS, US Energy Information Admininstration")
+```
 
 Upon zooming into state-level variables derived from RECS and ACS data, we observe several trends.
 In states with generally larger residential buildings, such as New York, Massachusetts, New Jersey, and Illinois, the median building age tends to be older.
 Conversely, states in the South and West exhibit a trend towards newer and comparatively smaller residential buildings.
-While this data is all highly aggregated, it could indicate a trend towards smaller residential buildings over time- a hopeful possibility for reducing residential energy use.
+While this data is all highly aggregated, it could indicate a connection between newer and smaller residential buildings- a hopeful possibility for reducing residential energy use.
 
-![](lilabeth_spatial_analysis_files/figure-html/fig-mult-maps-1.png)
+```{r fig.height=8, fig.width=11}
+# map housing type at the state level
+map_acs_unit_type <- function(unit_type, map_title) {
+  ggplot() +
+    geom_sf(data = acs, aes(fill = {{unit_type}} / total_units)) +
+    scale_fill_distiller(palette = "Oranges",
+                         direction = 1) +
+    labs(title = map_title,
+         fill = "Proportion") +
+    ggthemes::theme_map()
+}
+
+# create maps of the proportion of each type of housing by state
+single_unit_att <- map_acs_unit_type(unit_1_attached, "Proportion of Single Unit Attached Homes")
+
+single_unit_det <- map_acs_unit_type(unit_1_detached, "Proportion of Single Unit Detached Homes")
+
+small_apt <- map_acs_unit_type(units_2_4, "Proportion of Small Apartments (2-4 Unit)")
+
+large_apt <- map_acs_unit_type(units_5_plus, "Proportion of Large Apartments (5+ Unit)")
+
+units_by_state <- ggarrange(single_unit_det,
+                            single_unit_att,
+                            small_apt,
+                            large_apt)
+
+# collect figures into one graphic
+annotate_figure(
+  units_by_state,
+  top = text_grob(
+    "Frequency of Housing Types by State, 2011-2015",
+    face = "bold",
+    size = 18
+  )
+)
+```
+
 
 Looking at size by number of units, single-unit detached homes dominate overall, although less so in New England, where apartments and attached homes are relatively common.
 This is likely due to the presence of denser living areas like New York City.
 Over a fifth of Rhode Island's housing is small apartments, and New York, Connecticut, and New Jersey also have high proportions.
-Although not visible, around half of D.C.'s housing is large apartments, followed by New York, supporting the idea that cities tend to contain larger unit housing.
+Although not visible, around half of D.C.'s housing is large apartments, followed by New York, supporting the idea that cities tend to contain denser housing.
 
 The dominance of single-unit detached homes across most states demonstrates the necessity of addressing energy efficiency at the individual household level.
 However, variations in housing unit proportions, particularly in densely populated areas like New England, highlight the need for tailored policy interventions.
