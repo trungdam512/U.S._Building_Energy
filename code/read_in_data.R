@@ -102,7 +102,14 @@ recs2015_cleaned <- recs2015 %>%
       MONEYPY == 7 ~ "$120,000 to $139,999",
       MONEYPY == 8 ~ "$140,000 or more"
     ),
-    energy_asst_prgm = yesno_factor(ENERGYASST)
+    energy_asst_prgm = yesno_factor(ENERGYASST),
+    education = case_when(
+      EDUCATION == 1 ~ "Less than high school diploma or GED",
+      EDUCATION == 2 ~ "High school diploma or GED",
+      EDUCATION == 3 ~ "Some college or Associate’s degree",
+      EDUCATION == 4 ~ "Bachelor’s degree",
+      EDUCATION == 5 ~ "Master’s, Professional, or Doctorate degree"
+    )
   ) %>%
   select(
     ID = DOEID,
@@ -147,7 +154,7 @@ recs2015_cleaned <- recs2015 %>%
     smart_meter_viewed,
     hh_income,
     energy_asst_prgm,
-    EDUCATION,
+    education,
     # energy use
     BTUEL,
     DOLLAREL,
