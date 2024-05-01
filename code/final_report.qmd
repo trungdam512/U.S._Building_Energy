@@ -11,6 +11,9 @@ editor:
 format: 
   html:
     self-contained: true
+execute: 
+  echo: false
+  message: false
 ---
 
 ```{r libraries, echo = FALSE, message = FALSE}
@@ -98,10 +101,10 @@ We observe the trend of higher income households having better insulation status
 Thus, we fitted a model examining the relationship between total energy used per square foot and educational level, household incomes, and its interaction with insulation status.
 Households with higher income and higher education will have better energy efficiency in their homes (p \< 0.05).
 On the other hand, although the interaction between household incomes and their insulation level demonstrates a positive trend with total use of energy per square foot, p-values are generally larger than 0.15, implying this correlation is not statistically significant.
-```{r fig-insulation-hhincome, echo= FALSE}
+```{r fig-insulation-hhincome, echo= FALSE, message = FALSE}
 #| fig-cap: "Proportions of insulation levels among different household incomes. Higher income households tend to have better insulation level."
 
-socioeconomic_status <- recs %>% mutate(energy_persqft = TOTALBTU/TOTSQFT_EN) %>% select(region_name, adq_insulation, energy_persqft, hh_income, EDUCATION)
+socioeconomic_status <- recs %>% mutate(energy_persqft = TOTALBTU/TOTSQFT_EN) %>% select(region_name, adq_insulation, energy_persqft, hh_income, education)
 
 income_insul <- socioeconomic_status %>% group_by(hh_income, adq_insulation) %>% summarise(n = n()) %>% mutate(per = n*100/sum(n))
 
@@ -122,10 +125,11 @@ This suggests more intervention at state levels to educate households with low i
 ```{r fig-Education-level, echo= FALSE}
 #| fig-cap: "Total energy use per square foot among household with different education levels. Households with higher educational level have better energy efficiency."
 
-socioeconomic_status %>% ggplot(aes(x = factor(EDUCATION), y = energy_persqft))+
+socioeconomic_status %>% ggplot(aes(x = education, y = energy_persqft))+
   geom_boxplot()+
   labs(title = "Energy use per square foot among different educational levels", x = "Education Levels", y = "Energy per square foot")+
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45))
 ```
 Investigating the modernity of houses among four regions, we notice that Northeast is the region with the oldest houses.
 This makes complete sense due to the high density population with limited land to build and reconstruct modern houses.
@@ -261,7 +265,7 @@ States in the Midwest tend to have the largest homes, followed by those in New E
 This aligns with our earlier observations regarding the prevalence of older buildings in these regions.
 Since RECS data was collected to be compatible with the ACS, we can dive deeper into the demographic and housing characteristics influencing energy usage patterns.
 
-```{r echo=FALSE}
+```{r fig-sf-size-age, echo=FALSE, warning = FALSE}
 # Get the geometry from ACS data to join to RECS
 region_geometry <- acs %>%
   group_by(region) %>%
@@ -316,7 +320,7 @@ In states with generally larger residential buildings, such as New York, Massach
 Conversely, states in the South and West exhibit a trend towards newer and comparatively smaller residential buildings.
 While this data is all highly aggregated, it could indicate a connection between newer and smaller residential buildings- a hopeful possibility for reducing residential energy use.
 
-```{r fig.height=8, fig.width=11}
+```{r fig-sf-housing-type, fig.height=8, fig.width=11, echo = FALSE, warning = FALSE}
 # map housing type at the state level
 map_acs_unit_type <- function(unit_type, map_title) {
   ggplot() +
