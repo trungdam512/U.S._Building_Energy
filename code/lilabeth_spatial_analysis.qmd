@@ -1,8 +1,6 @@
 ---
 title: "Building Energy Spatial Viz"
-format: 
-  html:
-    self-contained: true
+format: html
 editor: visual
 ---
 

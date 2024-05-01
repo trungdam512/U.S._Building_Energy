@@ -57,7 +57,7 @@ RECS surveys a nationally representative sample of 5,600 residential units for i
 This is a somewhat limited sample size, raising the risk of greater errors and uncertainty.
 However, EIA used multistage area probability sample design, and claims that "all 118.2 million occupied primary households in the United States are represented by the sample" [@berry_recs_2018].
 
-![ ](lilabeth_spatial_analysis_files/RECSdatafig.png)
+![ ](../results/RECSdatafig.png)
 
 It is still important to note that RECS sampled only homes occupied as primary residences, excluding vacant or seasonal homes, as well as group quarters like dormitories.
 The survey was not weather-adjusted, meaning that heating or cooling estimates could be skewed if it was an abnormally hot or cold spell during the collection period.
@@ -70,7 +70,7 @@ RECS square footage estimates may not align with other sources, like the U.S.
 Census, because they are intended to represent only the energy-consuming space within a building.
 Accordingly, attics and garages are only included if they are heated or cooled [@berry_recs_2018].
 
-![Areas included in RECS household square footage. Source: U.S. Energy Information Administration](lilabeth_spatial_analysis_files/RECSsqftfig.png)
+![Areas included in RECS household square footage. Source: U.S. Energy Information Administration](../results/RECSsqftfig.png)
 
 We also used data from the 2015 American Community Survey (ACS), a branch of the U.S.
 Census.
@@ -172,7 +172,7 @@ The ease of travel which cars facilitated made it possible for cities to spread 
 The impact of the automobile era means that today, the majority of Americans live in detached, single-family homes, and many prefer it that way.
 Introduce a plan to develop more apartment buildings or increase density in residential areas, and you will often be met with intense backlash, as in the case of Minneapolis, MN's 2040 Comprehensive Plan.
 
-![Deshler Park, Ohio. Source: Homes.com ](lilabeth_spatial_analysis_files/deshler-park.jpg)
+![Deshler Park, Ohio. Source: Homes.com ](../results/deshler-park.jpg)
 
 However, many planners and policy experts are pushing back against the supremacy of low-density building.
 Urban researchers argue that high-density neighborhoods, especially those that contain a wide variety of development types, encourage walking and biking and are associated with a lower use of cars, resulting both in less congestion and in fewer greenhouse gas emissions, while often building up a strong tax base for the community [@kackar_creating_2003].
