@@ -1,15 +1,14 @@
 ---
 title: "Building Energy Spatial Viz"
-format: html
+format: 
+  html:
+    self-contained: true
 editor: visual
 ---
 
 ```{r, message=FALSE}
 library(tidyverse)
 library(sf) 
-library(terra)
-library(tigris)
-library(purrr)
 library(ggpubr)
 ```
 
@@ -22,8 +21,7 @@ acs <- readRDS("../data/acs_2015_cleaned.RDS")
 ```
 
 
-
-```{r}
+```{r message=FALSE}
 # set centers for mapping graduated symbols
 centers <- st_centroid(acs, of_largest_polygon = TRUE)
 ```
@@ -52,25 +50,32 @@ recs_housing_spatial <- region_geometry %>%
 # What is the RECS distribution of types of housing by region?
 
 ```{r}
-# Map proportion of types of homes
-map_recs_unit_type <- function(unit_type, map_title) {
-  recs_housing_spatial %>%
-    filter(housing_type == unit_type) %>%
-    ggplot() +
-    geom_sf(aes(fill = typeProportion)) +
+# Map a RECS variable 
+map_recs_var <- function(df, var, map_title, legend_title, direction=1) {
+  ggplot() +
+    geom_sf(data = df, aes(fill = {{var}})) +
     scale_fill_distiller(palette = "Purples",
-                         direction = 1) +
+                         direction = direction) +
     geom_sf(data = acs,
             color = "darkgray",
             fill = NA) +
     labs(title = map_title,
-         fill = "Proportion of all \nhousing in region") +
+         fill = legend_title) +
     ggthemes::theme_map()
+}
+
+# Map proportion of types of homes
+map_recs_unit_type <- function(unit_type, map_title, legend_title, direction=1) {
+  df <- recs_housing_spatial %>%
+    filter(housing_type == unit_type) 
+
+    map_recs_var(df, typeProportion, map_title, "Proportion of all \nhousing in region", direction)
 }
 ```
 
 
 ```{r}
+# create a map for each type of housing unit by region
 map_recs_unit_type("Single family attached", "Proportion of Single Unit Attached Homes")
 
 map_recs_unit_type("Single family detached", "Proportion of Single Unit Detached Homes")
@@ -87,27 +92,29 @@ Single-unit detached homes dominate by region, although less so in New England, 
 # What is the ACS estimate for distribution of housing type by state?
 
 ```{r}
-# map housing type at the state level
-map_acs_unit_type <- function(unit_type, map_title) {
+# map an ACS variable at the state level
+map_acs_var <- function(var, map_title, palette, direction=1, caption=NA) {
   ggplot() +
-    geom_sf(data = acs, aes(fill = {{unit_type}} / total_units)) +
-    scale_fill_distiller(palette = "Oranges",
-                         direction = 1) +
+    geom_sf(data = acs, aes(fill = {{var}})) +
+    scale_fill_distiller(palette = palette,
+                         direction = direction) +
     labs(title = map_title,
-         fill = "Proportion") +
+         fill = "Proportion",
+         caption=caption) +
     ggthemes::theme_map()
 }
 ```
 
 
 ```{r}
-single_unit_att <- map_acs_unit_type(unit_1_attached, "Proportion of Single Unit Attached Homes")
+# create a map for proportions of each type of housing unit by state
+single_unit_att <- map_acs_var(unit_1_attached/total_units, "Proportion of Single Unit Attached Homes", "Oranges")
 
-single_unit_det <- map_acs_unit_type(unit_1_detached, "Proportion of Single Unit Detached Homes")
+single_unit_det <- map_acs_var(unit_1_detached/total_units, "Proportion of Single Unit Detached Homes", "Oranges")
 
-small_apt <- map_acs_unit_type(units_2_4, "Proportion of Small Apartments (2-4 Unit)")
+small_apt <- map_acs_var(units_2_4/total_units, "Proportion of Small Apartments (2-4 Unit)", "Oranges")
 
-large_apt <- map_acs_unit_type(units_5_plus, "Proportion of Large Apartments (5+ Unit)")
+large_apt <- map_acs_var(units_5_plus/total_units, "Proportion of Large Apartments (5+ Unit)", "Oranges", caption="Data source: 2011-2015 5-year ACS, US Census Bureau")
 ```
 
 ```{r fig.height=8, fig.width=11, fig-mult-maps}
@@ -133,58 +140,36 @@ annotate_figure(
 
 #Who rents vs owns by state?
 ```{r}
-ggplot() +
-  geom_sf(data = acs, aes(fill = tenureOwned/tenureTotal)) +
-  scale_fill_distiller(palette = "Greens",
-                       direction = 1) +
-  labs(title = "Who Owns Housing?",
-       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-       fill = "Proportion \nOwning") +
-    ggthemes::theme_map()
+map_acs_var(tenureOwned/tenureTotal, "Who Owns Housing?", "Greens", caption="Data source: 2011-2015 5-year ACS, US Census Bureau")
 
-ggplot() +
-  geom_sf(data = acs, aes(fill = tenureRented/tenureTotal)) +
-  scale_fill_distiller(palette = "Greens",
-                       direction = 1) +
-  labs(title = "Who Rents Housing?",
-       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-       fill = "Proportion \nRenting") +
-    ggthemes::theme_map()
+map_acs_var(tenureRented/tenureTotal, "Who Rents Housing?", "Greens", caption="Data source: 2011-2015 5-year ACS, US Census Bureau")
 ```
 Generally, owning is more common then renting. The exceptions to this rule are New York, Calfornia, and Nevada- states with big cities. 
 
 
 # What's the median age of buildings by state?
 ```{r}
-ggplot() +
-  geom_sf(data = acs, aes(fill = med_year_built)) +
-    scale_fill_distiller(palette = "BuPu",
-                       direction = -1) +
-  labs(title = "Median Building Age, 2011-2015",
-       caption = "Data source: 2011-2015 5-year ACS, US Census Bureau",
-       fill = "Median Year Built") +
-    ggthemes::theme_map()
+map_acs_var(med_year_built, "Median Building Age, 2011-2015", "BuPu", -1, caption="Data source: 2011-2015 5-year ACS, US Census Bureau")
 ```
 Nevada has the newest buildings. Houses in the South and West generally tend to be newer. Houses in New York are oldest, along with several states in New England and the Midwest- notably Illinois, Iowa, and Ohio. 
 
 
 ```{r}
 # Add geometry to a summary of a RECS variable and map it 
-geom_map_var <- function(var, df, title, legend_title, palette) {
+geom_map_recs <- function(df, var, map_title, legend_title, palette) {
   data_geom <- region_geometry %>%
     left_join(df, join_by(region == region_name))
-  
-  ggplot() +
-    geom_sf(data = data_geom, aes(fill = {{var}})) +
-    scale_fill_distiller(palette = palette,
-                         direction = 1) +
-    geom_sf(data = acs,
-            color = "darkgray",
-            fill = NA) +
-    labs(title = title,
-         fill = legend_title) +
-    ggthemes::theme_map()
+
+  map_recs_var(data_geom, {{var}}, map_title, legend_title, palette)
 }
+
+# group by and summarize to get the regional means of a RECS variable
+calc_recs_summary <- function(grouping, mean_var){
+  recs %>%
+  group_by({{grouping}}) %>%
+  summarise(mean = mean({{mean_var}}))
+}
+
 ```
 
 
@@ -197,9 +182,9 @@ recs_aircon <- recs %>%
          proportion_aircon = n / total) %>%
   filter(aircon == "Yes")
 
-aircon_choropleth <- geom_map_var(
-  proportion_aircon,
+aircon_choropleth <- geom_map_recs(
   recs_aircon,
+  proportion_aircon,
   "Proportion of Homes with Air Conditioning",
   "Propotion",
   "Blues"
@@ -211,13 +196,11 @@ Air conditioning is nearly universal in the South, and is almost as common in th
 
 # Which regions use more energy?
 ```{r}
-recs_tot_energy <- recs %>%
-  group_by(region_name) %>%
-  summarise(mean_tot_en = mean(TOTALBTU))
+recs_tot_energy <- calc_recs_summary(region_name, TOTALBTU)
 
-tot_energy_choropleth <- geom_map_var(
-  mean_tot_en,
+tot_energy_choropleth <- geom_map_recs(
   recs_tot_energy,
+  mean,
   "Mean Energy Use by Region in 2015",
   "Mean Total Energy",
   "Reds"
@@ -229,13 +212,11 @@ New England and the Midwest overall use the most energy, followed by the South, 
 
 ## Which regions use more electricity?
 ```{r}
-recs_btu <- recs %>% 
-  group_by(region_name) %>% 
-  summarise(mean_btu = mean(BTUEL)) 
+recs_btu <- calc_recs_summary(region_name, BTUEL)
  
- btu_choropleth <- geom_map_var(
-  mean_btu,
+ btu_choropleth <- geom_map_recs(
   recs_btu,
+   mean,
   "Mean Electrity Usage by Region in 2015",
   "Mean Electricity \nUse (thousand \nBtu)",
   "Purples"
@@ -248,13 +229,12 @@ The South uses noticeably more air conditioning than other regions.
 
 ## What about natural gas?
 ```{r}
-recs_btn <-recs %>% 
-  group_by(region_name) %>% 
-  summarise(mean_btn = mean(BTUNG)) 
+recs_btn <- calc_recs_summary(region_name, BTUNG)
+
  
-btn_choropleth <- geom_map_var(
-  mean_btn,
+btn_choropleth <- geom_map_recs(
   recs_btn,
+  mean,
   "Mean Natural Gas Usage by Region in 2015",
   "Mean Natural \nGas Use\n(thousand Btu)",
   "Oranges"
@@ -276,13 +256,11 @@ btn_choropleth +
 ```
 
 ```{r}
-recs_sqft <- recs %>%
-  group_by(region_name) %>%
-  summarise(mean_sqft = mean(TOTSQFT_EN))
+recs_sqft <- calc_recs_summary(region_name, TOTSQFT_EN)
 
-sqft_choropleth <- geom_map_var(
-  mean_sqft,
+sqft_choropleth <- geom_map_recs(
   recs_sqft,
+  mean,
   "Median Building Age and Square Footage of Residential Buildings by Region in 2015",
   "Mean Square Feet",
   "Purples"
@@ -301,5 +279,3 @@ sqft_choropleth +
        caption = "Data sources: 2011-2015 ACS, US Census Bureau; 2015 RECS, US Energy Information Admininstration")
 ```
 
-To do: 
--make a more general function for ggplot
