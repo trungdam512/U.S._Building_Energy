@@ -14,6 +14,7 @@ format:
 execute: 
   echo: false
   message: false
+engine: knitr
 ---
 
 ```{r libraries, echo = FALSE, message = FALSE}
@@ -136,15 +137,58 @@ socioeconomic_status %>% ggplot(aes(x = education, y = energy_persqft))+
   theme(axis.text.x = element_text(angle = 45))
 ```
 
-Investigating the modernity of houses among four regions, we notice that Northeast is the region with the oldest houses.
+Our investigation finds potentially surprising energy use disparities across geographic region. In general, the Northeastern and Midwestern United States seem to use more energy per square foot, while the West and South use less. 
+
+```{r fig-sqft-region}
+#| fig-cap: "Correlation of energy use with home area, segmented by geographic region. Energy use and area are positively correlated, with differences across the four regions."
+recs %>% 
+  ggplot(aes(x = TOTSQFT_EN, y = TOTALBTU, color = region_name)) +
+  geom_point() +
+  geom_smooth(method = lm) +
+  theme_minimal() +
+  labs(title = "Energy use by home area and geographic region", x= "Size of home (sq. ft)", y = "Total energy use of  home (BTU)", color = "Region")
+```
+
+```{r lin-mod-sqft, include = FALSE}
+# general linear model
+# remove include = FALSE in order to see our modeling work
+gen_lin_mod <- lm(TOTALBTU ~ TOTSQFT_EN, data = recs)
+
+summary(gen_lin_mod)
+
+r_2 <- round(summary(gen_lin_mod)$r.squared,4)
+```
+
+
+```{r lin-mod-region, include = FALSE}
+# linear models by region
+# remove include = FALSE in order to see our modeling work
+regions <- recs %>% pull(region_name) %>% unique()
+region_mod_results <- vector(mode = "list", length = length(regions))
+names(region_mod_results) <- regions
+
+for (i in seq_along(regions)) { # iteratively create a linear model for each region
+    this_region <- regions[i]
+    recs_sub <- recs %>%
+        filter(region_name==this_region)
+    # The double square brackets [[i]] accesses the ith element of a list
+    region_mod_results[[i]] <- lm(TOTALBTU ~ TOTSQFT_EN, data = recs_sub)
+}
+
+purrr::map(region_mod_results, summary)
+```
+
+The correlation between square footage and energy use indicates that square footage is the strongest predictor of energy use we've found in this dataset, but with an $R^2$ of `{r} r_2`, it is not a particularly strong correlation. When we include geographic regions in that model, some of those regions display a higher correlation, while others, particularly the West, have a lower correlation. This indicates that the patterns of energy use are not as uniform in some regions as in others. Either way, it begs the question: what might drive this disparity?
+
+One answer could be house modernity or age. Investigating the modernity of houses among four regions, we notice that Northeast is the region with the oldest houses.
 This makes complete sense due to the high density population with limited land to build and reconstruct modern houses.
 Moreover, we discover similar trends of year range made of the houses and their insulation status.
 Indeed, the more modern the house is, the better it gets insulated.
 However, only in the West, poorly insulated households seem to be built before not insulated households.
-This is quite interesting and can be due to some policy (more research later on this).
-We would think that a better insulated house would use less energy (in BTU).
-However, this is not necessarily true due the confounding effect of household sizes.
-Particularly, bigger houses regardless of their insulation status would be more likely to use more energy.
+This is quite interesting and can be due to some policy (although that is outside of the scope of this report).
+We would think that a better insulated house would use less energy.
+However, this is not necessarily true due the confounding effect of house sizes.
+Particularly, bigger houses regardless of their insulation status are more likely to use more energy.
 The data demonstrates that better insulated households would consume less energy per square foot.
 Nevertheless, well insulated households in the Northeast tend to use a lot more energy per square foot compared to other regions.This can be due to higher residential density, resulting in more multifamily buildings than detached houses.
 Also, energy-related behavioral factors might play an important role in this trend.

@@ -154,7 +154,7 @@ recs2015_cleaned <- recs2015 %>%
     smart_meter_viewed,
     hh_income,
     energy_asst_prgm,
-    EDUCATION,
+    education,
     # energy use
     BTUEL,
     DOLLAREL,

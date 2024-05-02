@@ -230,7 +230,7 @@ regions <- recs %>% pull(region_name) %>% unique()
 region_mod_results <- vector(mode = "list", length = length(regions))
 names(region_mod_results) <- regions
 
-for (i in seq_along(regions)) {
+for (i in seq_along(regions)) { # iteratively create a linear model for each region
     this_region <- regions[i]
     recs_sub <- recs %>%
         filter(region_name==this_region)
