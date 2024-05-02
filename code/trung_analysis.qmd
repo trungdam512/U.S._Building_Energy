@@ -193,11 +193,21 @@ income_level <- c("Less than $20,000", "$20,000 - $39,999", "$40,000 - $59,999",
 
 insulation_level <- c("Not insulated", "Poorly insulated", "Adequately insulated", "Well insulated")
 
+#Insulation status among different household incomes
 ggplot(income_insul, aes(x = fct_relevel(factor(hh_income), income_level), y = per, fill = fct_relevel(factor(adq_insulation), insulation_level))) +
   geom_bar(position = "fill", stat = "identity") +
   labs(title = "Insulation level among different household incomes", x = "Household Incomes", y = "Frequency", fill = "Insulation level")+
   theme_minimal()+
   theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+#Energy use per square foot among different household incomes
+socioeconomic_status %>% ggplot(aes(x = fct_relevel(factor(hh_income), income_level), y= energy_persqft))+
+  geom_boxplot()+
+  labs(title = "Energy use per square foot among differnt household incomes", x = "Household Incomes", y = "Energy per square foot")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust=1))
+
+
 
 #Fit a linear regression model investigating the energy used per square foot and household income, insulation level, and educational level
 summary(lm(formula = energy_persqft ~ hh_income*adq_insulation + EDUCATION,data = socioeconomic_status))
