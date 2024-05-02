@@ -20,40 +20,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -79,69 +45,513 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
+<section id="fundamental-exploratory-analysis" class="level1">
+<h1>Fundamental Exploratory Analysis</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>weather<span class="sc">$</span>State.abb <span class="ot">&lt;-</span> <span class="fu">str_remove_all</span>(<span class="at">string =</span> weather<span class="sc">$</span>State.abb, <span class="at">pattern =</span><span class="st">"</span><span class="sc">\"</span><span class="st">"</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>weather<span class="sc">$</span>State.name <span class="ot">&lt;-</span> <span class="fu">str_remove_all</span>(<span class="at">string =</span> weather<span class="sc">$</span>State.name, <span class="at">pattern =</span><span class="st">"</span><span class="sc">\"</span><span class="st">"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>weather<span class="sc">$</span>Timestamp <span class="ot">&lt;-</span> <span class="fu">str_remove_all</span>(<span class="at">string =</span> weather<span class="sc">$</span>Timestamp, <span class="at">pattern =</span><span class="st">"</span><span class="sc">\"</span><span class="st">"</span>)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>weather <span class="ot">&lt;-</span> weather <span class="sc">%&gt;%</span> <span class="fu">left_join</span>(region, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"State.name"</span> <span class="ot">=</span> <span class="st">"State"</span>, <span class="st">"State.abb"</span> <span class="ot">=</span> <span class="st">"State.Code"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(State.name, Region, AvgTemp, MaxTemp, MinTemp) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Region))</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>temp_region <span class="ot">&lt;-</span> weather <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(Region) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">AvgTemp_region =</span> <span class="fu">mean</span>(AvgTemp),</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">AvgMaxTemp =</span> <span class="fu">mean</span>(MaxTemp),</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">AvgMinTemp =</span> <span class="fu">mean</span>(MinTemp)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> temp_region <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Region, <span class="at">y =</span> AvgTemp_region))<span class="sc">+</span></span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"lightblue"</span>, <span class="at">width =</span> <span class="fl">0.5</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>temp_region <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Region, <span class="at">y =</span> AvgMaxTemp))<span class="sc">+</span></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="trung_analysis_files/figure-html/temperature%20on%20total%20BTU-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>temp_region <span class="sc">%&gt;%</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Region, <span class="at">y =</span> AvgMinTemp))<span class="sc">+</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">fill =</span> <span class="st">"blue"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="trung_analysis_files/figure-html/temperature%20on%20total%20BTU-2.png" class="img-fluid" width="672"></p>
-</div>
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> recs <span class="sc">%&gt;%</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> region_name, <span class="at">y =</span> TOTALBTU)) <span class="sc">+</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>main_plot <span class="ot">&lt;-</span> <span class="fu">ggarrange</span>(x, y, <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">nrow =</span> <span class="dv">1</span>, <span class="at">align =</span> <span class="st">"v"</span>)</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>main_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="trung_analysis_files/figure-html/temperature%20on%20total%20BTU-3.png" class="img-fluid" width="672"></p>
+<p><img src="trung_analysis_files/figure-html/temperature%20on%20total%20energy-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>It is quite interesting how Southern states use less energy compared to Midwestern and Northeastern states despite its higher temperature. This might be due to higher use of natural gas, propane in colder states. It is also intriguing to look into housing efficiency differences between regions.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>y1 <span class="ot">&lt;-</span> recs <span class="sc">%&gt;%</span> </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> region_name, <span class="at">y =</span> BTUEL)) <span class="sc">+</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>main_plot1 <span class="ot">&lt;-</span> <span class="fu">ggarrange</span>(x, y1, <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">nrow =</span> <span class="dv">1</span>, <span class="at">align =</span> <span class="st">"v"</span>)</span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>main_plot1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="trung_analysis_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+<p><img src="trung_analysis_files/figure-html/temperature%20on%20total%20electricity%20and%20natural%20gases-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>y2 <span class="ot">&lt;-</span> recs <span class="sc">%&gt;%</span> </span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> region_name, <span class="at">y =</span> BTUNG)) <span class="sc">+</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>main_plot2 <span class="ot">&lt;-</span> <span class="fu">ggarrange</span>(x, y2, <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">nrow =</span> <span class="dv">1</span>, <span class="at">align =</span> <span class="st">"v"</span>)</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>main_plot2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="trung_analysis_files/figure-html/unnamed-chunk-1-2.png" class="img-fluid" width="672"></p>
+<p><img src="trung_analysis_files/figure-html/temperature%20on%20total%20electricity%20and%20natural%20gases-2.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>Looking closer to the usage of electricity, the South unsurprisingly consumes the most. This is likely because of their uses of AC to keep their house cool during hot weather. Whereas, the other regions contributes to much less electricity since they distribute their share of energy usage to natural gases and propane.</p>
+<p>In conclusion, the location influences the total usage of energy source due to regional different temperature characteristics. However, it would be interesting to look into how weather conditions affect the energy efficiency level of a house, i.e.&nbsp;harsh weather hazards might wear the houses’ conditions out.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/move%20in%20intervals%20effect%20on%20energy%20effciency%20of%20houses-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/move%20in%20intervals%20effect%20on%20energy%20effciency%20of%20houses-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>It seems like the bigger the gap between construction year and move-in year is, the less money a household have to pay for their energy. This might due to the fact that older houses are more likely to undergo upgrades, advancing their energy efficiency.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/move%20in%20intervals%20effect%20on%20energy%20effciency%20of%20houses%20in%20different%20regions-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>All regions’ older houses have to pay less for energy usages. Specifically, the western households are shown to pay the least money for their energy. More investigation on differences in house architecture and efficiency among U.S. regions would help us gain a closer look to this phenomenon.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/move%20in%20intervals%20effect%20on%20energy%20effciency%20of%20houses%20among%20different%20housing%20types-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/Midwest%20on%20total%20usage%20of%20natural%20gas-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/Midwest%20on%20total%20usage%20of%20natural%20gas-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/Midwest%20on%20total%20usage%20of%20natural%20gas-3.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>It is not surprising that modern houses in the Midwest have better heat encapsulation, resulting in the lower usage of natural gas for heating. We further investigate the which housing type would be the most efficient for natural gas. Apartment large building seems to work really efficiently. However, this might because nowadays, apartment usually install two-way AC, so taking into account total electricity use would be helpful.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/insulation%20and%20total%20electricity%20used-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/insulation%20and%20total%20electricity%20used-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This seems weird since households with no insulation seem to use less electricity to heat their house. Next move is to search in the data codebook to verify this.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/window/room/%20relationship%20with%20total%20efficiency-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/window/room/%20relationship%20with%20total%20efficiency-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 7 × 2
+  WINDOWS     n
+    &lt;int&gt; &lt;int&gt;
+1      10   250
+2      20   786
+3      30  1380
+4      41  1822
+5      42   626
+6      50   629
+7      60   193</code></pre>
+</div>
+</div>
+<p>The number of households that have more than 20+ windows are so small that it doensn’t show much.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/high%20ceiling-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>It is understandable that household with high ceiling would use more total energy in BTU compared to ones with low ceiling and less area space.</p>
+<section id="regional-differences" class="level3">
+<h3 class="anchored" data-anchor-id="regional-differences">Regional Differences</h3>
+<p>My hypothesis is region that has: 1. better socioeconomic status, which is influenced by educational levels 2. newer houses with stricter building codes and standards (insulation for heating and cooling) 3. moderate weather patterns, which leads to more energy efficiency 4. growing emergence of energy-efficient technologies and eco-conscious would use less energy.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/Socioeconomic%20Status-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = energy_persqft ~ hh_income * adq_insulation + EDUCATION, 
+    data = socioeconomic_status)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-55.368 -15.379  -3.986  10.541 232.939 
+
+Coefficients:
+                                                             Estimate
+(Intercept)                                                   45.7168
+hh_income$120,000 to $139,999                                  3.6358
+hh_income$140,000 or more                                      4.5367
+hh_income$20,000 - $39,999                                     6.1203
+hh_income$40,000 - $59,999                                     4.8752
+hh_income$60,000 to $79,999                                    6.1735
+hh_income$80,000 to $99,999                                    2.6096
+hh_incomeLess than $20,000                                     5.5713
+adq_insulationNot insulated                                   -8.1184
+adq_insulationPoorly insulated                                 7.9084
+adq_insulationWell insulated                                  -3.0901
+EDUCATION                                                     -2.3582
+hh_income$120,000 to $139,999:adq_insulationNot insulated     30.0916
+hh_income$140,000 or more:adq_insulationNot insulated         -4.2381
+hh_income$20,000 - $39,999:adq_insulationNot insulated         3.8832
+hh_income$40,000 - $59,999:adq_insulationNot insulated        -6.0940
+hh_income$60,000 to $79,999:adq_insulationNot insulated       -7.9141
+hh_income$80,000 to $99,999:adq_insulationNot insulated        9.2926
+hh_incomeLess than $20,000:adq_insulationNot insulated        21.0110
+hh_income$120,000 to $139,999:adq_insulationPoorly insulated  -1.4456
+hh_income$140,000 or more:adq_insulationPoorly insulated      -6.6505
+hh_income$20,000 - $39,999:adq_insulationPoorly insulated     -4.4273
+hh_income$40,000 - $59,999:adq_insulationPoorly insulated     -3.9520
+hh_income$60,000 to $79,999:adq_insulationPoorly insulated    -9.0209
+hh_income$80,000 to $99,999:adq_insulationPoorly insulated   -10.0405
+hh_incomeLess than $20,000:adq_insulationPoorly insulated      1.1499
+hh_income$120,000 to $139,999:adq_insulationWell insulated     0.5014
+hh_income$140,000 or more:adq_insulationWell insulated        -1.4324
+hh_income$20,000 - $39,999:adq_insulationWell insulated       -1.7536
+hh_income$40,000 - $59,999:adq_insulationWell insulated       -0.2705
+hh_income$60,000 to $79,999:adq_insulationWell insulated      -2.3792
+hh_income$80,000 to $99,999:adq_insulationWell insulated       4.5065
+hh_incomeLess than $20,000:adq_insulationWell insulated        0.2737
+                                                             Std. Error t value
+(Intercept)                                                      1.9760  23.136
+hh_income$120,000 to $139,999                                    2.5845   1.407
+hh_income$140,000 or more                                        2.1104   2.150
+hh_income$20,000 - $39,999                                       1.8779   3.259
+hh_income$40,000 - $59,999                                       1.9676   2.478
+hh_income$60,000 to $79,999                                      1.9981   3.090
+hh_income$80,000 to $99,999                                      2.1533   1.212
+hh_incomeLess than $20,000                                       1.9969   2.790
+adq_insulationNot insulated                                     10.4587  -0.776
+adq_insulationPoorly insulated                                   3.4363   2.301
+adq_insulationWell insulated                                     2.4594  -1.256
+EDUCATION                                                        0.3068  -7.686
+hh_income$120,000 to $139,999:adq_insulationNot insulated       17.0706   1.763
+hh_income$140,000 or more:adq_insulationNot insulated           19.4513  -0.218
+hh_income$20,000 - $39,999:adq_insulationNot insulated          12.3011   0.316
+hh_income$40,000 - $59,999:adq_insulationNot insulated          12.1974  -0.500
+hh_income$60,000 to $79,999:adq_insulationNot insulated         14.7490  -0.537
+hh_income$80,000 to $99,999:adq_insulationNot insulated         14.1556   0.656
+hh_incomeLess than $20,000:adq_insulationNot insulated          11.3323   1.854
+hh_income$120,000 to $139,999:adq_insulationPoorly insulated     5.5417  -0.261
+hh_income$140,000 or more:adq_insulationPoorly insulated         4.9097  -1.355
+hh_income$20,000 - $39,999:adq_insulationPoorly insulated        3.8497  -1.150
+hh_income$40,000 - $59,999:adq_insulationPoorly insulated        4.0363  -0.979
+hh_income$60,000 to $79,999:adq_insulationPoorly insulated       4.4037  -2.049
+hh_income$80,000 to $99,999:adq_insulationPoorly insulated       4.9095  -2.045
+hh_incomeLess than $20,000:adq_insulationPoorly insulated        3.9389   0.292
+hh_income$120,000 to $139,999:adq_insulationWell insulated       3.8877   0.129
+hh_income$140,000 or more:adq_insulationWell insulated           3.1795  -0.451
+hh_income$20,000 - $39,999:adq_insulationWell insulated          2.8855  -0.608
+hh_income$40,000 - $59,999:adq_insulationWell insulated          3.0261  -0.089
+hh_income$60,000 to $79,999:adq_insulationWell insulated         3.0534  -0.779
+hh_income$80,000 to $99,999:adq_insulationWell insulated         3.3386   1.350
+hh_incomeLess than $20,000:adq_insulationWell insulated          3.0027   0.091
+                                                             Pr(&gt;|t|)    
+(Intercept)                                                   &lt; 2e-16 ***
+hh_income$120,000 to $139,999                                 0.15955    
+hh_income$140,000 or more                                     0.03162 *  
+hh_income$20,000 - $39,999                                    0.00112 ** 
+hh_income$40,000 - $59,999                                    0.01325 *  
+hh_income$60,000 to $79,999                                   0.00201 ** 
+hh_income$80,000 to $99,999                                   0.22561    
+hh_incomeLess than $20,000                                    0.00529 ** 
+adq_insulationNot insulated                                   0.43764    
+adq_insulationPoorly insulated                                0.02140 *  
+adq_insulationWell insulated                                  0.20899    
+EDUCATION                                                    1.78e-14 ***
+hh_income$120,000 to $139,999:adq_insulationNot insulated     0.07799 .  
+hh_income$140,000 or more:adq_insulationNot insulated         0.82753    
+hh_income$20,000 - $39,999:adq_insulationNot insulated        0.75226    
+hh_income$40,000 - $59,999:adq_insulationNot insulated        0.61737    
+hh_income$60,000 to $79,999:adq_insulationNot insulated       0.59157    
+hh_income$80,000 to $99,999:adq_insulationNot insulated       0.51155    
+hh_incomeLess than $20,000:adq_insulationNot insulated        0.06378 .  
+hh_income$120,000 to $139,999:adq_insulationPoorly insulated  0.79421    
+hh_income$140,000 or more:adq_insulationPoorly insulated      0.17560    
+hh_income$20,000 - $39,999:adq_insulationPoorly insulated     0.25018    
+hh_income$40,000 - $59,999:adq_insulationPoorly insulated     0.32756    
+hh_income$60,000 to $79,999:adq_insulationPoorly insulated    0.04056 *  
+hh_income$80,000 to $99,999:adq_insulationPoorly insulated    0.04089 *  
+hh_incomeLess than $20,000:adq_insulationPoorly insulated     0.77034    
+hh_income$120,000 to $139,999:adq_insulationWell insulated    0.89739    
+hh_income$140,000 or more:adq_insulationWell insulated        0.65235    
+hh_income$20,000 - $39,999:adq_insulationWell insulated       0.54340    
+hh_income$40,000 - $59,999:adq_insulationWell insulated       0.92876    
+hh_income$60,000 to $79,999:adq_insulationWell insulated      0.43590    
+hh_income$80,000 to $99,999:adq_insulationWell insulated      0.17712    
+hh_incomeLess than $20,000:adq_insulationWell insulated       0.92737    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 23.1 on 5653 degrees of freedom
+Multiple R-squared:  0.04658,   Adjusted R-squared:  0.04118 
+F-statistic: 8.631 on 32 and 5653 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>We observe the trend of higher income households having better insulation status. Thus, we want to fit a model examining the relationship between total energy used per square foot and educational level, household incomes, and its interaction with insulation status. We observe household with higher income and higher education will have better energy efficiency in their houses (p &lt; 0.05). On the other hand, although the interaction between household incomes and their insulation level demonstrates a positive trend with total use of energy per square foot, p-values are generally bigger to 0.15, implying this correlation is not statistically significant.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mod_form, data = socioeconomic_status %&gt;% filter(region_name == 
+    region))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-42.670 -14.478  -3.999   9.167 238.402 
+
+Coefficients:
+                              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                    44.3434     2.7676  16.022  &lt; 2e-16 ***
+hh_income$120,000 to $139,999   3.9628     3.1348   1.264  0.20637    
+hh_income$140,000 or more       0.6363     2.4469   0.260  0.79485    
+hh_income$20,000 - $39,999      3.6892     2.3159   1.593  0.11137    
+hh_income$40,000 - $59,999      2.3985     2.4263   0.989  0.32304    
+hh_income$60,000 to $79,999     3.7741     2.4122   1.565  0.11789    
+hh_income$80,000 to $99,999     4.1714     2.6243   1.590  0.11214    
+hh_incomeLess than $20,000      7.4140     2.4361   3.043  0.00238 ** 
+EDUCATION                      -2.9217     0.5562  -5.253 1.71e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 22.3 on 1546 degrees of freedom
+Multiple R-squared:  0.0422,    Adjusted R-squared:  0.03724 
+F-statistic: 8.515 on 8 and 1546 DF,  p-value: 2.136e-11</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mod_form, data = socioeconomic_status %&gt;% filter(region_name == 
+    region))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-45.644 -16.368  -4.214  10.722 113.796 
+
+Coefficients:
+                              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                    48.0789     3.5415  13.576  &lt; 2e-16 ***
+hh_income$120,000 to $139,999   1.7489     3.8377   0.456  0.64867    
+hh_income$140,000 or more       2.5594     3.4325   0.746  0.45602    
+hh_income$20,000 - $39,999      7.1481     2.9221   2.446  0.01457 *  
+hh_income$40,000 - $59,999      4.4579     3.0389   1.467  0.14264    
+hh_income$60,000 to $79,999     5.4389     3.0442   1.787  0.07423 .  
+hh_income$80,000 to $99,999     2.9888     3.3358   0.896  0.37043    
+hh_incomeLess than $20,000      6.8424     3.0948   2.211  0.02721 *  
+EDUCATION                      -2.0748     0.6713  -3.091  0.00204 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 23.61 on 1318 degrees of freedom
+Multiple R-squared:  0.02374,   Adjusted R-squared:  0.01781 
+F-statistic: 4.006 on 8 and 1318 DF,  p-value: 0.0001038</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mod_form, data = socioeconomic_status %&gt;% filter(region_name == 
+    region))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-44.048 -14.547  -3.634  10.073 198.324 
+
+Coefficients:
+                              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                    44.0721     2.6253  16.787  &lt; 2e-16 ***
+hh_income$120,000 to $139,999   0.2926     3.0866   0.095   0.9245    
+hh_income$140,000 or more       4.9389     2.5428   1.942   0.0522 .  
+hh_income$20,000 - $39,999      4.2232     2.2383   1.887   0.0593 .  
+hh_income$40,000 - $59,999      5.1574     2.2906   2.252   0.0245 *  
+hh_income$60,000 to $79,999     2.7755     2.4213   1.146   0.2518    
+hh_income$80,000 to $99,999     2.7451     2.5817   1.063   0.2878    
+hh_incomeLess than $20,000      5.1890     2.3485   2.209   0.0273 *  
+EDUCATION                      -2.4751     0.4906  -5.045 4.94e-07 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 21.81 on 2001 degrees of freedom
+Multiple R-squared:  0.02692,   Adjusted R-squared:  0.02303 
+F-statistic: 6.919 on 8 and 2001 DF,  p-value: 5.094e-09</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mod_form, data = socioeconomic_status %&gt;% filter(region_name == 
+    region))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-50.894 -17.136  -4.558  12.596 123.333 
+
+Coefficients:
+                              Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                    50.5903     4.5724  11.064   &lt;2e-16 ***
+hh_income$120,000 to $139,999  10.6346     4.8085   2.212   0.0273 *  
+hh_income$140,000 or more       5.5897     4.0904   1.367   0.1722    
+hh_income$20,000 - $39,999      7.7157     3.8059   2.027   0.0430 *  
+hh_income$40,000 - $59,999      5.2430     3.9618   1.323   0.1861    
+hh_income$60,000 to $79,999     2.8513     3.9555   0.721   0.4712    
+hh_income$80,000 to $99,999     1.4426     4.4620   0.323   0.7465    
+hh_incomeLess than $20,000     12.4069     4.0201   3.086   0.0021 ** 
+EDUCATION                      -2.1133     0.8781  -2.407   0.0163 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 25.48 on 785 degrees of freedom
+Multiple R-squared:  0.03988,   Adjusted R-squared:  0.03009 
+F-statistic: 4.075 on 8 and 785 DF,  p-value: 9.066e-05</code></pre>
+</div>
+</div>
+<p>Breaking down into four regions, it is quite interesting that the relationship between higher income and higher energy efficiency per square foot is not statistically significant (p &gt; 0.05). However, household that have income less than $20,000 tend to use more energy per square foot. Education level is still have a negative relationship with energy efficiency as the lower educational level is, the more energy that households use. This suggests more intervention at state levels to educate household with low income and low educational level on how to efficiently use their energy.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/Education%20level-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/Number%20of%20household%20each%20category-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Northeast is the region with oldest houses. This makes sense due to the high density population with limited land to build modern houses.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 16 × 4
+# Groups:   region_name [4]
+   region_name adq_insulation       median_age median_BTU
+   &lt;chr&gt;       &lt;chr&gt;                     &lt;dbl&gt;      &lt;dbl&gt;
+ 1 Midwest     Adequately insulated        4         42.5
+ 2 Midwest     Not insulated               3.5       48.1
+ 3 Midwest     Poorly insulated            2         48.6
+ 4 Midwest     Well insulated              5         37.5
+ 5 Northeast   Adequately insulated        3         46.2
+ 6 Northeast   Not insulated               1.5       43.8
+ 7 Northeast   Poorly insulated            2         53.0
+ 8 Northeast   Well insulated              4         42.1
+ 9 South       Adequately insulated        5         36.5
+10 South       Not insulated               3         38.0
+11 South       Poorly insulated            4         41.3
+12 South       Well insulated              6         34.2
+13 West        Adequately insulated        4         35.4
+14 West        Not insulated               3         39.3
+15 West        Poorly insulated            4         37.6
+16 West        Well insulated              5         32.0</code></pre>
+</div>
+</div>
+<p>We observe similar trends of year range made of the houses and their insulation status. The more modern the house is, the better it gets insulated. However, only in the West, poorly insulated households seem to be built before not insulated households. This is quite interesting and can be due to some policy (more research later on this). I would think better insulated house would use less energy (in BTU). However, this is not necessarily true due the confounding effect of household sizes. Indeed, bigger houses regardless of its insulation status would be more likely to use more energy. Therefore, we calculated the median of energy used per square foot. The results show that our hypothesis is correct: better insulated households would use consume less energy per square foot. However, well insulated households in the Northeast tend to use a lot more energy per square foot compared to other regions. WHY?</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/Regional%20energy%20use%20discrepances%20among%20different%20insulation%20levels-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Among four insulation statuses, Northeast uses the most energy per square foot. This can be due to higher residential density, resulting in more multifamily buildings than detached houses. Also, energy-related behavioral factors might play an important role in this trend.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mod_form, data = energy_behavior %&gt;% filter(region_name == 
+    region))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-40.551 -14.009  -3.994   9.796 238.280 
+
+Coefficients:
+                                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                          7.2991    10.2397   0.713  0.47608    
+TEMPGONE                            -0.3470     0.1329  -2.611  0.00912 ** 
+TEMPHOME                             0.4281     0.1798   2.381  0.01740 *  
+TEMPNITE                             0.3292     0.1365   2.412  0.01601 *  
+summer_TEMPGONE                     -0.1887     0.1420  -1.328  0.18425    
+summer_TEMPHOME                      0.2909     0.1713   1.698  0.08973 .  
+summer_TEMPNITE                     -0.1179     0.1701  -0.693  0.48842    
+equip_used_shortManually adjust      4.6794     1.7467   2.679  0.00747 ** 
+equip_used_shortNo control           2.4261     5.3479   0.454  0.65015    
+equip_used_shortOne temp             7.9669     1.7243   4.620 4.19e-06 ***
+equip_used_shortOther                2.3407    11.4566   0.204  0.83814    
+equip_used_shortProgram thermostat   2.8267     1.8368   1.539  0.12405    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 22.66 on 1385 degrees of freedom
+Multiple R-squared:  0.03195,   Adjusted R-squared:  0.02427 
+F-statistic: 4.156 on 11 and 1385 DF,  p-value: 4.615e-06</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mod_form, data = energy_behavior %&gt;% filter(region_name == 
+    region))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-40.909 -14.832  -4.209  10.342 201.802 
+
+Coefficients:
+                                   Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                        13.33464   10.11131   1.319 0.187400    
+TEMPGONE                           -0.11841    0.12719  -0.931 0.351981    
+TEMPHOME                            0.43768    0.18450   2.372 0.017778 *  
+TEMPNITE                            0.08598    0.16123   0.533 0.593913    
+summer_TEMPGONE                     0.11172    0.15182   0.736 0.461909    
+summer_TEMPHOME                    -0.44211    0.21131  -2.092 0.036549 *  
+summer_TEMPNITE                     0.35429    0.18055   1.962 0.049870 *  
+equip_used_shortManually adjust    -4.63682    1.72651  -2.686 0.007302 ** 
+equip_used_shortNo control         -7.80404    6.10565  -1.278 0.201347    
+equip_used_shortOne temp           -1.58948    1.66660  -0.954 0.340343    
+equip_used_shortOther              -7.23383   12.88278  -0.562 0.574515    
+equip_used_shortProgram thermostat -7.28370    1.97995  -3.679 0.000241 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 22.13 on 1899 degrees of freedom
+Multiple R-squared:  0.02056,   Adjusted R-squared:  0.01489 
+F-statistic: 3.624 on 11 and 1899 DF,  p-value: 4.284e-05</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mod_form, data = energy_behavior %&gt;% filter(region_name == 
+    region))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-48.375 -16.042  -4.231  10.576 118.698 
+
+Coefficients:
+                                   Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)                        12.97717   13.09315   0.991   0.3218  
+TEMPGONE                            0.05506    0.19968   0.276   0.7828  
+TEMPHOME                            0.25806    0.27756   0.930   0.3527  
+TEMPNITE                            0.20146    0.23814   0.846   0.3977  
+summer_TEMPGONE                     0.27535    0.20260   1.359   0.1743  
+summer_TEMPHOME                    -0.39829    0.26908  -1.480   0.1391  
+summer_TEMPNITE                     0.04003    0.24955   0.160   0.8726  
+equip_used_shortManually adjust     2.20976    2.91070   0.759   0.4479  
+equip_used_shortNo control          7.12813    5.98333   1.191   0.2337  
+equip_used_shortOne temp            5.21584    2.84014   1.836   0.0665 .
+equip_used_shortOther              18.91348   23.83942   0.793   0.4277  
+equip_used_shortProgram thermostat  0.93799    3.01418   0.311   0.7557  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 23.65 on 1315 degrees of freedom
+Multiple R-squared:  0.02259,   Adjusted R-squared:  0.01441 
+F-statistic: 2.763 on 11 and 1315 DF,  p-value: 0.001502</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = mod_form, data = energy_behavior %&gt;% filter(region_name == 
+    region))
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-48.905 -16.733  -4.742  11.259 117.845 
+
+Coefficients:
+                                    Estimate Std. Error t value Pr(&gt;|t|)  
+(Intercept)                          6.69871   17.05782   0.393   0.6946  
+TEMPGONE                             0.41811    0.25063   1.668   0.0957 .
+TEMPHOME                            -0.19170    0.33234  -0.577   0.5642  
+TEMPNITE                             0.39524    0.25302   1.562   0.1187  
+summer_TEMPGONE                      0.26232    0.21142   1.241   0.2151  
+summer_TEMPHOME                     -0.20098    0.27291  -0.736   0.4617  
+summer_TEMPNITE                     -0.02621    0.26651  -0.098   0.9217  
+equip_used_shortManually adjust     -0.97653    3.25968  -0.300   0.7646  
+equip_used_shortNo control           6.67026    4.30605   1.549   0.1218  
+equip_used_shortOne temp            -0.14183    3.17473  -0.045   0.9644  
+equip_used_shortOther              -16.87866   15.11500  -1.117   0.2645  
+equip_used_shortProgram thermostat  -0.64422    3.40660  -0.189   0.8501  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 25.62 on 781 degrees of freedom
+Multiple R-squared:  0.03089,   Adjusted R-squared:  0.01724 
+F-statistic: 2.263 on 11 and 781 DF,  p-value: 0.01028</code></pre>
+</div>
+</div>
+<p>Fitting models of energy-related behaviors among regions, we don’t see any statistical significant trend between total used of energy per square foot and temperature set during day, night in winter and summer in the Midwest and Northeast. On the other hand, in the South, during winter, if houses increase their temperature by 1 degree F during winter, they will increase 0.43 BTU energy per square foot. In the summer, if houses increase their temperature by 1 degree F, they will decrease 0.44 BTU energy per square foot. In the West, during winter, keeping temperature low when leaving the house would save around 0.35 BTU energy per square feet, whereas increasing temperature during home and at night results in higher energy usage. Furthermore, in the South, households that can manually adjust or program thermostat are more energy efficient. In the West, unabling to adjust households temperature causes more energy loss.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="trung_analysis_files/figure-html/weather-related%20behavior-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Compared between different regions, North East uses most energy per square foot despite a milder weather compared to the Midwest and the South. Despite having the highest temperature, the South uses the second-least energy in BTU. This might due to better housing architect, allowing fresh air to flow through the household.</p>
+</section>
+</section>
 
 </main>
 <!-- /main column -->
